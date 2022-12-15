@@ -25,4 +25,20 @@ fun Route.restarting(){
         call.respond(HttpStatusCode.OK, "Scrapping restarted")
         restart()
     }
+    get("/set-details"){
+        val params = call.parameters
+        val _cfrToken = params["c_token"]
+        val _userId = params["user_id"]
+        val _sessionId = params["session"]
+        _cfrToken?.let {
+            cfrToken = it
+        }
+        _userId?.let {
+            ds_userId = it
+        }
+        _sessionId?.let {
+            sessionId = it
+        }
+        call.respond(HttpStatusCode.OK, "Details set")
+    }
 }

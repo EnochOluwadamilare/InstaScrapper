@@ -23,7 +23,9 @@ var page = 186
 val tag = "lagosvendors"
 var cfrToken = "55BUlSmVsTZexURxbsQrHeegdulzpRnq"
 
-val sessionId = "56978350990%3AKI4VrU7DrgfEnp%3A27%3AAYd-HYbQCyWvOpg9WSTkDbUujQMWvPnnIzHzU0rO2g"
+var ds_userId = ""
+
+var sessionId = "56978350990%3AKI4VrU7DrgfEnp%3A27%3AAYd-HYbQCyWvOpg9WSTkDbUujQMWvPnnIzHzU0rO2g"
 val appId = "936619743392459"
 
 var profileSessionId = "47362721982%3AhHbk20BmZ9i9pD%3A25%3AAYfp8DDIhKbN0EpFhk4rDD7gy4yQdbiov3_mW17igA"
@@ -151,7 +153,7 @@ suspend fun getOtherPages(): List<UserAndId> {
         header("x-ig-app-id", appId)
         header(
             "cookie",
-            "sessionid=$sessionId; ds_user_id=47362721982"
+            "sessionid=$sessionId; ds_user_id=$ds_userId; csrftoken=$cfrToken"
         )
         header("accept", "*/*")
         header("x-csrftoken", cfrToken)
