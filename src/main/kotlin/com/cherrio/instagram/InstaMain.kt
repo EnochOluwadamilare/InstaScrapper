@@ -15,12 +15,11 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 var maxId = "QVFBOWNHeldZMWNfUlh2OHRFb0c5UGhxWTZBemdQbUM4d1BnRjBjV245eVNzcmxEczVwSW11OVhYbFRHc21NOXZTS25Xc3c3bEpSbEkxMzFJRjRTXzhHYg=="
 var page = 186
-val tag = "lagosvendors"
+val tag = "ibadanvendors"
 var cfrToken = "55BUlSmVsTZexURxbsQrHeegdulzpRnq"
 
 var ds_userId = ""
@@ -35,7 +34,7 @@ val sheetDb = SheetsDb {
         "ya29.a0AeTM1idDgIb_hy9Fv_tJ16dlS2pUAjCwiugdWPblYOhlAEvm3yNRYvh4wuCpzLx_CaCyaqeqCUnrw_Ec8C2uE2r6VTygWzwB8tYm3c4jBVcyLXKG8PIRvTxFexqHgBXCVu2hHmiZQLv1Ka_BpiznlQxaA5mz-x0nTgaCgYKAeISAQASFQHWtWOmyqT0Rt1DeXUGJzm1EoNiXw0169"
     sheetId = "1YmBiVCmYn2fn15wmmy_Ex6aOGNyC5wv991vTAZkZby8"
 }
-var table = sheetDb.getTable<LagosVendors>()
+var table = sheetDb.getTable<IbadanVendors>()
 
 //fun main() = runBlocking {
 //    val sheetDb = SheetsDb {
@@ -174,7 +173,7 @@ suspend fun getOtherPages(): List<UserAndId> {
 }
 
 fun User.map() =
-    LagosVendors(
+    IbadanVendors(
         username = username,
         profileUrl = "https://www.instagram.com/$username",
         fullName = fullName,
@@ -199,7 +198,7 @@ data class UserAndId(
 )
 
 @Serializable
-data class LagosVendors(
+data class IbadanVendors(
     @SerialName("username")
     val username: String,
     @SerialName("profile_url")
