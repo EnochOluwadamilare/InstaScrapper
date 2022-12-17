@@ -99,7 +99,7 @@ suspend fun getUserDetails(userId: String):User {
     val response = client.get("https://i.instagram.com/api/v1/users/$userId/info/") {
         header("x-ig-app-id", appId)
         header(
-            "cookie", "sessionid=$profileSessionId"
+            "cookie", "sessionid=$sessionId"
         )
     }
     if (!response.status.isSuccess()){
@@ -154,10 +154,12 @@ suspend fun getOtherPages(): List<UserAndId> {
             "cookie",
             "sessionid=$sessionId; ds_user_id=$ds_userId; csrftoken=$cfrToken"
         )
-        header("accept", "*/*")
         header("x-csrftoken", cfrToken)
     }
     //println(response.bodyAsText())
+    if (!response.status.isSuccess()){
+        println(response.bodyAsText())
+    }
     val body = response.body<Recent>()
     cfrToken = response.setCookie().find { it.name == "csrftoken" }?.value.ifNull { cfrToken }
     maxId = body.nextMaxId
