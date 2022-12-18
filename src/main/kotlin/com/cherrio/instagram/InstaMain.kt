@@ -156,21 +156,28 @@ suspend fun getOtherPages(): List<UserAndId> {
         )
         header("x-csrftoken", cfrToken)
     }
-    //println(response.bodyAsText())
-    if (!response.status.isSuccess()){
-        println(response.bodyAsText())
+    return if (!response.status.isSuccess()){
+        val error = response.bodyAsText()
+        if (error == "Oops, an error occurred."){
+            delay(5000)
+            getOtherPages()
+        }else{
+            println(error)
+            throw Exception(error)
+        }
+    }else {
+        val body = response.body<Recent>()
+        cfrToken = response.setCookie().find { it.name == "csrftoken" }?.value.ifNull { cfrToken }
+        maxId = body.nextMaxId
+        page = body.nextPage
+        println("PAGE: $page")
+        println("MAX_ID: $maxId")
+        body.sections.map {
+            it.layoutContent.medias.map { mediaXX ->
+                UserAndId(mediaXX.media.user.pk, mediaXX.media.user.username)
+            }.distinct()
+        }.flatten().distinct()
     }
-    val body = response.body<Recent>()
-    cfrToken = response.setCookie().find { it.name == "csrftoken" }?.value.ifNull { cfrToken }
-    maxId = body.nextMaxId
-    page = body.nextPage
-    println("PAGE: $page")
-    println("MAX_ID: $maxId")
-    return body.sections.map {
-        it.layoutContent.medias.map { mediaXX ->
-            UserAndId(mediaXX.media.user.pk, mediaXX.media.user.username)
-        }.distinct()
-    }.flatten().distinct()
     //return emptyList()
 }
 
@@ -198,6 +205,11 @@ data class UserAndId(
     val id: String,
     val username: String
 )
+
+//@Serializable
+//data class ErrorResponse(
+//
+//)
 
 @Serializable
 data class IbadanVendors(
