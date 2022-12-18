@@ -104,14 +104,8 @@ suspend fun getUserDetails(userId: String):User {
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        if (error.contains("Oops, an error occurred.")){
-            println("Retrying...")
-            delay(2000)
-            getUserDetails(userId)
-        }else{
-            println(error)
-            throw Exception(error)
-        }
+        println(error)
+        throw Exception(error)
     }else {
         val userResponse = response.body<UserResponse>()
         userResponse.user
