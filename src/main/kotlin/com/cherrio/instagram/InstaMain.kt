@@ -102,12 +102,19 @@ suspend fun getUserDetails(userId: String):User {
             "cookie", "sessionid=$sessionId"
         )
     }
-    if (!response.status.isSuccess()){
-        println(response.bodyAsText())
+    return if (!response.status.isSuccess()){
+        val error = response.bodyAsText()
+        if (error == "Oops, an error occurred."){
+            delay(4000)
+            getUserDetails(userId)
+        }else{
+            println(error)
+            throw Exception(error)
+        }
+    }else {
+        val userResponse = response.body<UserResponse>()
+        userResponse.user
     }
-
-    val userResponse = response.body<UserResponse>()
-    return userResponse.user
 }
 
 private suspend fun getFirstPage(): List<UserAndId> {
