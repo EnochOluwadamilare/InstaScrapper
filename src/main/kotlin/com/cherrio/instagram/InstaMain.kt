@@ -17,15 +17,15 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
 
-var maxId = "QVFBOWNHeldZMWNfUlh2OHRFb0c5UGhxWTZBemdQbUM4d1BnRjBjV245eVNzcmxEczVwSW11OVhYbFRHc21NOXZTS25Xc3c3bEpSbEkxMzFJRjRTXzhHYg=="
-var page = 186
+var maxId = "QVFDaGdDMXdWTHp1WnM0SUc0RjVkT3dTWTVJRDFGT19wZnJNWVVwOGphaExBWjNPVUczQnBmMzJXSDVCWGtGQ0UtSlBqSHU3eUp5azdfamRObG14SGJOdw=="
+var page = 596
 val tag = "ibadanvendors"
-var cfrToken = "55BUlSmVsTZexURxbsQrHeegdulzpRnq"
+var cfrToken = "8h69SLQL15JD8o1dRggPGgJ66JThfmXF"
 
 
-var ds_userId = ""
+var ds_userId = "56978350990"
 
-var sessionId = "56978350990%3AKI4VrU7DrgfEnp%3A27%3AAYd-HYbQCyWvOpg9WSTkDbUujQMWvPnnIzHzU0rO2g"
+var sessionId = "56978350990%3A6pWqAZfi0sDxae%3A27%3AAYf0xw_LAgKf3tULEyj-nzeo23ji4RBjKbtcHkMTGg"
 val appId = "936619743392459"
 
 var profileSessionId = "47362721982%3AhHbk20BmZ9i9pD%3A25%3AAYfp8DDIhKbN0EpFhk4rDD7gy4yQdbiov3_mW17igA"
