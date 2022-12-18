@@ -104,7 +104,7 @@ suspend fun getUserDetails(userId: String):User {
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        if (error == "Oops, an error occurred."){
+        if (error.contains("Oops, an error occurred.")){
             delay(4000)
             getUserDetails(userId)
         }else{
@@ -165,7 +165,7 @@ suspend fun getOtherPages(): List<UserAndId> {
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        if (error == "Oops, an error occurred."){
+        if (error.contains("Oops, an error occurred.")){
             delay(5000)
             getOtherPages()
         }else{
