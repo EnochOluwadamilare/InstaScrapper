@@ -20,15 +20,18 @@ import kotlin.time.Duration.Companion.minutes
 var maxId = "QVFDaGdDMXdWTHp1WnM0SUc0RjVkT3dTWTVJRDFGT19wZnJNWVVwOGphaExBWjNPVUczQnBmMzJXSDVCWGtGQ0UtSlBqSHU3eUp5azdfamRObG14SGJOdw=="
 var page = 596
 val tag = "ibadanvendors"
-var cfrToken = "8h69SLQL15JD8o1dRggPGgJ66JThfmXF"
 
+var cfrToken1 = "8h69SLQL15JD8o1dRggPGgJ66JThfmXF"
+var cfrToken2 = "8h69SLQL15JD8o1dRggPGgJ66JThfmXF"
 
-var ds_userId = "56978350990"
+var ds_userId1 = "56978350990"
+var ds_userId2 = "56978350990"
 
-var sessionId = "56978350990%3A6pWqAZfi0sDxae%3A27%3AAYf0xw_LAgKf3tULEyj-nzeo23ji4RBjKbtcHkMTGg"
+var sessionId1 = "56978350990%3A6pWqAZfi0sDxae%3A27%3AAYf0xw_LAgKf3tULEyj-nzeo23ji4RBjKbtcHkMTGg"
+var sessionId2 = "56978350990%3A6pWqAZfi0sDxae%3A27%3AAYf0xw_LAgKf3tULEyj-nzeo23ji4RBjKbtcHkMTGg"
+
 val appId = "936619743392459"
 
-var profileSessionId = "47362721982%3AhHbk20BmZ9i9pD%3A25%3AAYfp8DDIhKbN0EpFhk4rDD7gy4yQdbiov3_mW17igA"
 
 val sheetDb = SheetsDb {
     bearerToken =
@@ -100,7 +103,7 @@ suspend fun getUserDetails(userId: String):User {
     val response = client.get("https://i.instagram.com/api/v1/users/$userId/info/") {
         header("x-ig-app-id", appId)
         header(
-            "cookie", "sessionid=$sessionId"
+            "cookie", "sessionid=$sessionId2"
         )
     }
     return if (!response.status.isSuccess()){
@@ -121,7 +124,7 @@ private suspend fun getFirstPage(): List<UserAndId> {
         header("x-ig-app-id", appId)
         header(
             "cookie",
-            "sessionid=$sessionId; ds_user_id=47362721982"
+            "sessionid=$sessionId1; ds_user_id=47362721982"
         )
         header("accept", "*/*")
     }
@@ -155,9 +158,9 @@ suspend fun getOtherPages(): List<UserAndId> {
         header("x-ig-app-id", appId)
         header(
             "cookie",
-            "sessionid=$sessionId; ds_user_id=$ds_userId; csrftoken=$cfrToken"
+            "sessionid=$sessionId1; ds_user_id=$ds_userId1; csrftoken=$cfrToken1"
         )
-        header("x-csrftoken", cfrToken)
+        header("x-csrftoken", cfrToken1)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -170,7 +173,7 @@ suspend fun getOtherPages(): List<UserAndId> {
         }
     }else {
         val body = response.body<Recent>()
-        cfrToken = response.setCookie().find { it.name == "csrftoken" }?.value.ifNull { cfrToken }
+        cfrToken1 = response.setCookie().find { it.name == "csrftoken" }?.value.ifNull { cfrToken1 }
         maxId = body.nextMaxId
         page = body.nextPage
         println("PAGE: $page")
