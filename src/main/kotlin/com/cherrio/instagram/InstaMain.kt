@@ -17,67 +17,20 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
 
-var maxId = "QVFDaGdDMXdWTHp1WnM0SUc0RjVkT3dTWTVJRDFGT19wZnJNWVVwOGphaExBWjNPVUczQnBmMzJXSDVCWGtGQ0UtSlBqSHU3eUp5azdfamRObG14SGJOdw=="
-var page = 596
-val tag = "ibadanvendors"
-
-var cfrToken1 = "8h69SLQL15JD8o1dRggPGgJ66JThfmXF"
-var cfrToken2 = "8h69SLQL15JD8o1dRggPGgJ66JThfmXF"
-
-var ds_userId1 = "56978350990"
-var ds_userId2 = "56978350990"
-
-var sessionId1 = "56978350990%3A6pWqAZfi0sDxae%3A27%3AAYf0xw_LAgKf3tULEyj-nzeo23ji4RBjKbtcHkMTGg"
-var sessionId2 = "56978350990%3A6pWqAZfi0sDxae%3A27%3AAYf0xw_LAgKf3tULEyj-nzeo23ji4RBjKbtcHkMTGg"
-
-val appId = "936619743392459"
-
+var maxId = ""
+var page = 0
+val tag = "abeokutavendors"
 
 val sheetDb = SheetsDb {
     bearerToken =
         "ya29.a0AeTM1idDgIb_hy9Fv_tJ16dlS2pUAjCwiugdWPblYOhlAEvm3yNRYvh4wuCpzLx_CaCyaqeqCUnrw_Ec8C2uE2r6VTygWzwB8tYm3c4jBVcyLXKG8PIRvTxFexqHgBXCVu2hHmiZQLv1Ka_BpiznlQxaA5mz-x0nTgaCgYKAeISAQASFQHWtWOmyqT0Rt1DeXUGJzm1EoNiXw0169"
     sheetId = "1YmBiVCmYn2fn15wmmy_Ex6aOGNyC5wv991vTAZkZby8"
 }
-var table = sheetDb.getTable<IbadanVendors>()
+var table = sheetDb.getTable<AbeokutaVendors>()
 
-//fun main() = runBlocking {
-//    val sheetDb = SheetsDb {
-//        bearerToken =
-//            "ya29.a0AeTM1idDgIb_hy9Fv_tJ16dlS2pUAjCwiugdWPblYOhlAEvm3yNRYvh4wuCpzLx_CaCyaqeqCUnrw_Ec8C2uE2r6VTygWzwB8tYm3c4jBVcyLXKG8PIRvTxFexqHgBXCVu2hHmiZQLv1Ka_BpiznlQxaA5mz-x0nTgaCgYKAeISAQASFQHWtWOmyqT0Rt1DeXUGJzm1EoNiXw0169"
-//        sheetId = "1YmBiVCmYn2fn15wmmy_Ex6aOGNyC5wv991vTAZkZby8"
-//    }
-//    val table = sheetDb.getTable<LagosVendors>()
-////    val users = getFirstPage()
-////    val userDetails = users.map {
-////        async { getUserDetails(it.id) }
-////    }.awaitAll()
-////
-////    println(userDetails.map { it.publicEmail })
-////
-////    userDetails.forEach {
-////        table.create(it.map())
-////    }
-////    println("First page done....")
-////
-////    //next pages
-////
-//    while (true) {
-//        val users2 = getOtherPages()
-//        val userDetails = users2.get()
-////        users2.forEach {
-////            val user = getUserDetails(it.id)
-////            table.create(user.map())
-////        }
-//        userDetails.forEach {
-//            table.create(it.map())
-//        }
-//        println("Page $page done....")
-//        println("Delaying for 2 minutes")
-//        delay(2.minutes)
-//    }
-//
-//    //val u = getOtherPages()
-//}
+var credentials = listOf<Credentials>()
+var index = 0
+
 
 suspend fun restart(){
     while (true) {
@@ -99,11 +52,12 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 }
 
 suspend fun getUserDetails(userId: String):User {
+    val credentials = credentials[index]
     delay(1000)
     val response = client.get("https://i.instagram.com/api/v1/users/$userId/info/") {
-        header("x-ig-app-id", appId)
+        header("x-ig-app-id", credentials.appId)
         header(
-            "cookie", "sessionid=$sessionId2"
+            "cookie", "sessionid=${credentials.sessionId}; csrftoken=${credentials.crfToken}; ds_user_id=${credentials.userId}"
         )
     }
     return if (!response.status.isSuccess()){
@@ -111,40 +65,41 @@ suspend fun getUserDetails(userId: String):User {
         println(error)
         throw Exception(error)
     }else {
+        incrementIndex()
         val userResponse = response.body<UserResponse>()
         userResponse.user
     }
 }
 
-private suspend fun getFirstPage(): List<UserAndId> {
-    val response = client.get("https://www.instagram.com/api/v1/tags/web_info") {
-        url {
-            parameters.append("tag_name", tag)
-        }
-        header("x-ig-app-id", appId)
-        header(
-            "cookie",
-            "sessionid=$sessionId1; ds_user_id=47362721982"
-        )
-        header("accept", "*/*")
-    }
-    //println(response.bodyAsText())
-    val tagResponse = response.body<TagResponse>()
-    maxId = tagResponse.data.recent.nextMaxId
-    page = tagResponse.data.recent.nextPage
-    println("PAGE: $page")
-    println("MAX_ID: $maxId")
-    return tagResponse.data.recent.sections.map {
-        it.layoutContent.medias.map { mediaXX ->
-            UserAndId(mediaXX.media.user.pk, mediaXX.media.user.username)
-        }.distinct()
-    }.flatten().distinct()
-
-    //return emptyList()
-}
+//private suspend fun getFirstPage(): List<UserAndId> {
+//    val response = client.get("https://www.instagram.com/api/v1/tags/web_info") {
+//        url {
+//            parameters.append("tag_name", tag)
+//        }
+//        header("x-ig-app-id", appId)
+//        header(
+//            "cookie",
+//            "sessionid=$sessionId1; ds_user_id=47362721982"
+//        )
+//        header("accept", "*/*")
+//    }
+//    //println(response.bodyAsText())
+//    val tagResponse = response.body<TagResponse>()
+//    maxId = tagResponse.data.recent.nextMaxId
+//    page = tagResponse.data.recent.nextPage
+//    println("PAGE: $page")
+//    println("MAX_ID: $maxId")
+//    return tagResponse.data.recent.sections.map {
+//        it.layoutContent.medias.map { mediaXX ->
+//            UserAndId(mediaXX.media.user.pk, mediaXX.media.user.username)
+//        }.distinct()
+//    }.flatten().distinct()
+//
+//    //return emptyList()
+//}
 
 suspend fun getOtherPages(): List<UserAndId> {
-    //delay(1000)
+    val credentials = credentials[index]
     val response = client.submitForm(
         url = "https://www.instagram.com/api/v1/tags/$tag/sections/",
         formParameters = Parameters.build {
@@ -155,12 +110,12 @@ suspend fun getOtherPages(): List<UserAndId> {
             append("tab", "recent")
         }
     ){
-        header("x-ig-app-id", appId)
+        header("x-ig-app-id", credentials.appId)
         header(
             "cookie",
-            "sessionid=$sessionId1; ds_user_id=$ds_userId1; csrftoken=$cfrToken1"
+            "sessionid=${credentials.sessionId}; ds_user_id=${credentials.userId}; csrftoken=${credentials.crfToken}"
         )
-        header("x-csrftoken", cfrToken1)
+        header("x-csrftoken", credentials.crfToken)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -172,8 +127,8 @@ suspend fun getOtherPages(): List<UserAndId> {
             throw Exception(error)
         }
     }else {
+        incrementIndex()
         val body = response.body<Recent>()
-        cfrToken1 = response.setCookie().find { it.name == "csrftoken" }?.value.ifNull { cfrToken1 }
         maxId = body.nextMaxId
         page = body.nextPage
         println("PAGE: $page")
@@ -184,11 +139,16 @@ suspend fun getOtherPages(): List<UserAndId> {
             }.distinct()
         }.flatten().distinct()
     }
-    //return emptyList()
+}
+
+fun incrementIndex(){
+    if (index == 5)
+        index = 0
+    else index++
 }
 
 fun User.map() =
-    IbadanVendors(
+    AbeokutaVendors(
         username = username,
         profileUrl = "https://www.instagram.com/$username",
         fullName = fullName,
@@ -211,14 +171,16 @@ data class UserAndId(
     val id: String,
     val username: String
 )
-
-//@Serializable
-//data class ErrorResponse(
-//
-//)
+@Serializable
+data class Credentials(
+    val sessionId: String,
+    val userId: String,
+    val crfToken: String,
+    val appId: String
+)
 
 @Serializable
-data class IbadanVendors(
+data class AbeokutaVendors(
     @SerialName("username")
     val username: String,
     @SerialName("profile_url")
