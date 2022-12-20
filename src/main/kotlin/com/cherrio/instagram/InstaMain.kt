@@ -46,13 +46,14 @@ suspend fun restart(){
 }
 
 suspend fun List<UserAndId>.get() = coroutineScope {
-    map {
-        async { getUserDetails(it.id) }
-    }.awaitAll()
+    val credentials = credentials[index]
+    val users = map { async { getUserDetails(it.id, credentials) } }.awaitAll()
+    println("Using Index: $index for details")
+    incrementIndex()
+    return@coroutineScope users
 }
 
-suspend fun getUserDetails(userId: String):User {
-    val credentials = credentials[index]
+suspend fun getUserDetails(userId: String, credentials: Credentials):User {
     delay(1000)
     val response = client.get("https://i.instagram.com/api/v1/users/$userId/info/") {
         header("x-ig-app-id", credentials.appId)
@@ -65,8 +66,6 @@ suspend fun getUserDetails(userId: String):User {
         println(error)
         throw Exception(error)
     }else {
-        println("Using Index: $index")
-        incrementIndex()
         val userResponse = response.body<UserResponse>()
         userResponse.user
     }
@@ -128,7 +127,7 @@ suspend fun getOtherPages(): List<UserAndId> {
             throw Exception(error)
         }
     }else {
-        println("Using Index: $index")
+        println("Using Index: $index for page")
         incrementIndex()
         val body = response.body<Recent>()
         maxId = body.nextMaxId
