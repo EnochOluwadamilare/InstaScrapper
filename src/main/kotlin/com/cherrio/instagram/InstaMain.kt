@@ -15,6 +15,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration.Companion.minutes
 
 var maxId = ""
 var page = 0
@@ -39,15 +40,15 @@ suspend fun restart(){
             table.create(it.map())
         }
         println("Page $page done....")
-        println("Delaying for 2 minutes")
-        //delay(2.minutes)
+        println("Delaying for 1 minutes")
+        delay(1.minutes)
     }
 }
 
 suspend fun List<UserAndId>.get() = coroutineScope {
     val credentials = credentials[index]
-    val users = map { async { getUserDetails(it.id, credentials) } }.awaitAll()
     println("Using Index: $index for details")
+    val users = map { async { getUserDetails(it.id, credentials) } }.awaitAll()
     incrementIndex()
     return@coroutineScope users
 }
@@ -63,7 +64,7 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
         println(error)
-        credentials.drop(index)
+        credentials.dropAt(index)
         index = 0
         getUserDetails(userId, credentials.get(index))
     }else {
@@ -121,7 +122,7 @@ suspend fun getOtherPages(): List<UserAndId> {
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
         println(error)
-        credentials.drop(index)
+        credentials.dropAt(index)
         index = 0
         getOtherPages()
     }else {
@@ -141,9 +142,11 @@ suspend fun getOtherPages(): List<UserAndId> {
 }
 
 fun incrementIndex(){
-    if (index == credentials.size - 1)
+    if (index == credentials.size - 1) {
         index = 0
-    else index++
+    } else {
+        index++
+    }
 }
 fun List<Credentials>.dropAt(pos: Int){
     credentials = credentials.filterIndexed { index, _ -> pos != index }
