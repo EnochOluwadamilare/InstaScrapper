@@ -15,7 +15,6 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.time.Duration.Companion.minutes
 
 var maxId = ""
 var page = 0
@@ -41,7 +40,7 @@ suspend fun restart(){
         }
         println("Page $page done....")
         println("Delaying for 2 minutes")
-        delay(2.minutes)
+        //delay(2.minutes)
     }
 }
 
@@ -53,18 +52,20 @@ suspend fun List<UserAndId>.get() = coroutineScope {
     return@coroutineScope users
 }
 
-suspend fun getUserDetails(userId: String, credentials: Credentials):User {
+suspend fun getUserDetails(userId: String, credential: Credentials):User {
     delay(1000)
     val response = client.get("https://i.instagram.com/api/v1/users/$userId/info/") {
-        header("x-ig-app-id", credentials.appId)
+        header("x-ig-app-id", credential.appId)
         header(
-            "cookie", "sessionid=${credentials.sessionId}; csrftoken=${credentials.crfToken}; ds_user_id=${credentials.userId}"
+            "cookie", "sessionid=${credential.sessionId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
         )
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
         println(error)
-        throw Exception(error)
+        credentials.drop(index)
+        index = 0
+        getUserDetails(userId, credentials.get(index))
     }else {
         val userResponse = response.body<UserResponse>()
         userResponse.user
@@ -99,7 +100,7 @@ suspend fun getUserDetails(userId: String, credentials: Credentials):User {
 //}
 
 suspend fun getOtherPages(): List<UserAndId> {
-    val credentials = credentials[index]
+    val credential = credentials[index]
     val response = client.submitForm(
         url = "https://www.instagram.com/api/v1/tags/$tag/sections/",
         formParameters = Parameters.build {
@@ -110,22 +111,19 @@ suspend fun getOtherPages(): List<UserAndId> {
             append("tab", "recent")
         }
     ){
-        header("x-ig-app-id", credentials.appId)
+        header("x-ig-app-id", credential.appId)
         header(
             "cookie",
-            "sessionid=${credentials.sessionId}; ds_user_id=${credentials.userId}; csrftoken=${credentials.crfToken}"
+            "sessionid=${credential.sessionId}; ds_user_id=${credential.userId}; csrftoken=${credential.crfToken}"
         )
-        header("x-csrftoken", credentials.crfToken)
+        header("x-csrftoken", credential.crfToken)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        if (error.contains("Oops, an error occurred.")){
-            delay(5000)
-            getOtherPages()
-        }else{
-            println(error)
-            throw Exception(error)
-        }
+        println(error)
+        credentials.drop(index)
+        index = 0
+        getOtherPages()
     }else {
         println("Using Index: $index for page")
         incrementIndex()
@@ -143,9 +141,12 @@ suspend fun getOtherPages(): List<UserAndId> {
 }
 
 fun incrementIndex(){
-    if (index == 5)
+    if (index == credentials.size - 1)
         index = 0
     else index++
+}
+fun List<Credentials>.dropAt(pos: Int){
+    credentials = credentials.filterIndexed { index, _ -> pos != index }
 }
 
 fun User.map() =
