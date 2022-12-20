@@ -28,6 +28,15 @@ fun Route.restarting(){
         credentials = creds.credentials
         call.respond(HttpStatusCode.OK, "Details set")
     }
+    get("/profile"){
+        val params = call.parameters
+        val _maxId = params["max_id"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Provide max_ID")
+        val _page = params["page"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Provide page")
+        maxId = _maxId
+        page = _page.toInt()
+        call.respond(HttpStatusCode.OK, "Scrapping restarted")
+        getProfiles()
+    }
 }
 
 @Serializable

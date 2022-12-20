@@ -31,7 +31,24 @@ var table = sheetDb.getTable<AbeokutaVendors>()
 var credentials = listOf<Credentials>()
 var index = 0
 
-
+val userAndIds = mutableListOf<UserAndId>()
+var times = 0
+suspend fun getProfiles(){
+    while (times != 10) {
+        val list = getOtherPages()
+        userAndIds.addAll(list)
+        times++
+        println("Added $times")
+        delay(1.minutes)
+    }
+    val credential = credentials[index]
+    val userDetails = userAndIds.map { getUserDetails(it.id, credential) }
+    userDetails.forEach {
+        table.create(it.map())
+    }
+    times = 0
+    getProfiles()
+}
 suspend fun restart(){
     while (true) {
         val users2 = getOtherPages()
@@ -127,7 +144,6 @@ suspend fun getOtherPages(): List<UserAndId> {
         getOtherPages()
     }else {
         println("Using Index: $index for page")
-        incrementIndex()
         val body = response.body<Recent>()
         maxId = body.nextMaxId
         page = body.nextPage
