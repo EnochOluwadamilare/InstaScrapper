@@ -133,6 +133,7 @@ suspend fun getOtherPages(): List<UserAndId> {
         page = body.nextPage
         println("PAGE: $page")
         println("MAX_ID: $maxId")
+        println("Index: $index")
         body.sections.map {
             it.layoutContent.medias.map { mediaXX ->
                 UserAndId(mediaXX.media.user.pk, mediaXX.media.user.username)
