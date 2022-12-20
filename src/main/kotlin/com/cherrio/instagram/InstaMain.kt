@@ -65,6 +65,7 @@ suspend fun getUserDetails(userId: String):User {
         println(error)
         throw Exception(error)
     }else {
+        println("Using Index: $index")
         incrementIndex()
         val userResponse = response.body<UserResponse>()
         userResponse.user
@@ -127,13 +128,13 @@ suspend fun getOtherPages(): List<UserAndId> {
             throw Exception(error)
         }
     }else {
+        println("Using Index: $index")
         incrementIndex()
         val body = response.body<Recent>()
         maxId = body.nextMaxId
         page = body.nextPage
         println("PAGE: $page")
         println("MAX_ID: $maxId")
-        println("Index: $index")
         body.sections.map {
             it.layoutContent.medias.map { mediaXX ->
                 UserAndId(mediaXX.media.user.pk, mediaXX.media.user.username)
