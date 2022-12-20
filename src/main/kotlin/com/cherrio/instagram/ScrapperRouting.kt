@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 
 fun Application.scrapperRouting(){
     routing {
@@ -23,7 +24,13 @@ fun Route.restarting(){
         restart()
     }
     get("/set-details"){
-       credentials = call.receive<List<Credentials>>()
+       val creds = call.receive<Creds>()
+        credentials = creds.credentials
         call.respond(HttpStatusCode.OK, "Details set")
     }
 }
+
+@Serializable
+data class Creds(
+    val credentials: List<Credentials>
+)
