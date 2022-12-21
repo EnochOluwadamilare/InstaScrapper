@@ -19,14 +19,14 @@ import kotlin.time.Duration.Companion.minutes
 
 var maxId = ""
 var page = 0
-val tag = "abeokutavendors"
+val tag = "lagosbusiness"
 
 val sheetDb = SheetsDb {
     bearerToken =
         "ya29.a0AeTM1idDgIb_hy9Fv_tJ16dlS2pUAjCwiugdWPblYOhlAEvm3yNRYvh4wuCpzLx_CaCyaqeqCUnrw_Ec8C2uE2r6VTygWzwB8tYm3c4jBVcyLXKG8PIRvTxFexqHgBXCVu2hHmiZQLv1Ka_BpiznlQxaA5mz-x0nTgaCgYKAeISAQASFQHWtWOmyqT0Rt1DeXUGJzm1EoNiXw0169"
     sheetId = "1YmBiVCmYn2fn15wmmy_Ex6aOGNyC5wv991vTAZkZby8"
 }
-var table = sheetDb.getTable<AbeokutaVendors>()
+var table = sheetDb.getTable<LagosBusiness>()
 
 var credentials = listOf<Credentials>()
 var index = 0
@@ -169,7 +169,7 @@ fun List<Credentials>.dropAt(pos: Int){
 }
 
 fun User.map() =
-    AbeokutaVendors(
+    LagosBusiness(
         username = username,
         profileUrl = "https://www.instagram.com/$username",
         fullName = fullName,
@@ -201,7 +201,7 @@ data class Credentials(
 )
 
 @Serializable
-data class AbeokutaVendors(
+data class LagosBusiness(
     @SerialName("username")
     val username: String,
     @SerialName("profile_url")
