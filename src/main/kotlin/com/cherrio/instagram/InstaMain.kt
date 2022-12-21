@@ -64,7 +64,7 @@ suspend fun restart(){
 
 suspend fun List<UserAndId>.get() = coroutineScope {
     val credential = credentials[index]
-    println("Using ${credential.name}'s account for page")
+    println("Using ${credential.name}'s account for user details")
     val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
     incrementIndex()
     return@coroutineScope users
