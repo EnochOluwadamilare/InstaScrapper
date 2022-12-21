@@ -57,15 +57,15 @@ suspend fun restart(){
             table.create(it.map())
         }
         println("Page $page done....")
-        println("Delaying for 1 minutes")
+        println("Delaying for 1 minute")
         delay(1.minutes)
     }
 }
 
 suspend fun List<UserAndId>.get() = coroutineScope {
-    val credentials = credentials[index]
-    println("Using Index: $index for details")
-    val users = map { async { getUserDetails(it.id, credentials) } }.awaitAll()
+    val credential = credentials[index]
+    println("Using ${credential.name}'s account for page")
+    val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
     incrementIndex()
     return@coroutineScope users
 }
@@ -143,7 +143,7 @@ suspend fun getOtherPages(): List<UserAndId> {
         index = 0
         getOtherPages()
     }else {
-        println("Using Index: $index for page")
+        println("Using ${credential.name}'s account for page")
         val body = response.body<Recent>()
         maxId = body.nextMaxId
         page = body.nextPage
@@ -165,7 +165,8 @@ fun incrementIndex(){
     }
 }
 fun List<Credentials>.dropAt(pos: Int){
-    credentials = credentials.filterIndexed { index, _ -> pos != index }
+    println("Dropping ${get(index).name}'s account")
+    credentials = filterIndexed { index, _ -> pos != index }
 }
 
 fun User.map() =
@@ -197,7 +198,8 @@ data class Credentials(
     val sessionId: String,
     val userId: String,
     val crfToken: String,
-    val appId: String
+    val appId: String,
+    val name: String
 )
 
 @Serializable
