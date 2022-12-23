@@ -77,6 +77,9 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
         header(
             "cookie", "sessionid=${credential.sessionId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
         )
+        header("x-csrftoken", credential.crfToken)
+        header("authority", "www.instagram.com")
+        header("referer", "https://www.instagram.com/")
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -135,6 +138,8 @@ suspend fun getOtherPages(): List<UserAndId> {
             "sessionid=${credential.sessionId}; ds_user_id=${credential.userId}; csrftoken=${credential.crfToken}"
         )
         header("x-csrftoken", credential.crfToken)
+        header("authority", "www.instagram.com")
+        header("referer", "https://www.instagram.com/")
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()

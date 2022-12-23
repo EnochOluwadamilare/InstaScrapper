@@ -10,7 +10,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
 val client = HttpClient(Java){
-    CurlUserAgent()
+    BrowserUserAgent()
     install(ContentNegotiation){
         json(json = Json { 
             ignoreUnknownKeys = true
