@@ -63,7 +63,7 @@ suspend fun restart(){
 }
 
 suspend fun List<UserAndId>.get() = coroutineScope {
-    val credential = credentials[index]
+    val credential = credentials[0]
     println("Using ${credential.name}'s account for user details")
     val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
     incrementIndex()
@@ -79,6 +79,7 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
         )
         header("x-csrftoken", credential.crfToken)
     }
+    println(response.bodyAsText())
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
         println(error)
@@ -119,7 +120,8 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
 //}
 
 suspend fun getOtherPages(): List<UserAndId> {
-    val credential = credentials[index]
+    val credential = credentials[1]
+    println("Using ${credential.name}'s account for page")
     val response = client.submitForm(
         url = "https://www.instagram.com/api/v1/tags/$tag/sections/",
         formParameters = Parameters.build {
@@ -146,7 +148,6 @@ suspend fun getOtherPages(): List<UserAndId> {
         index = 0
         getOtherPages()
     }else {
-        println("Using ${credential.name}'s account for page")
         val body = response.body<Recent>()
         maxId = body.nextMaxId
         page = body.nextPage
