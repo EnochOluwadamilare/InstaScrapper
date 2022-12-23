@@ -21,7 +21,6 @@ fun Route.restarting(){
         maxId = _maxId
         page = _page.toInt()
         call.respond(HttpStatusCode.OK, "Scrapping restarted")
-        shuffleUserAgent()
         restart()
 
     }

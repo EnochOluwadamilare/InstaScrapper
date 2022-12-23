@@ -58,6 +58,7 @@ suspend fun restart(){
         val usersAndId = getOtherPages()
         usersAndId.forEach {
             val credential = credentials[index]
+            println("Using ${credential.name}'s account for user details")
             getUserDetails(it.id, credential){ user ->
                 table.create(user.map())
             }
@@ -77,13 +78,12 @@ suspend fun restart(){
 
 suspend fun getUserDetails(userId: String, credential: Credentials, block: suspend (User) -> Unit) {
     delay(2000)
-    val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
+    val response = client.get("https://www.instagram.com/api/v1/users/$userId/info") {
         header("x-ig-app-id", credential.appId)
         header(
             "cookie", "sessionid=${credential.sessionId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
         )
         header("x-csrftoken", credential.crfToken)
-        userAgent(userAgent)
     }
     if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -151,7 +151,6 @@ suspend fun getOtherPages(): List<UserAndId> {
             "sessionid=${credential.sessionId}; ds_user_id=${credential.userId}; csrftoken=${credential.crfToken}"
         )
         header("x-csrftoken", credential.crfToken)
-        userAgent(userAgent)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
