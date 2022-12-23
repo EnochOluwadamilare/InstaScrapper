@@ -15,6 +15,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 var maxId = ""
@@ -33,67 +34,72 @@ var index = 0
 
 val userAndIds = mutableListOf<UserAndId>()
 var times = 0
-suspend fun getProfiles(){
-    while (times != 10) {
-        val list = getOtherPages()
-        userAndIds.addAll(list)
-        times++
-        println("Added $times")
-        delay(1.minutes)
-    }
-    val credential = credentials[index]
-    val userDetails = userAndIds.map { getUserDetails(it.id, credential) }
-    userDetails.forEach {
-        table.create(it.map())
-    }
-    times = 0
-    getProfiles()
+val userAgents = setOf(
+    "Mozilla/5.0 (Linux; Android 12; SM-S906N Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.119 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 10; SM-G996U Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 12; Pixel 6 Build/SD1A.210817.023; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/94.0.4606.71 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 10; Google Pixel 4 Build/QD1A.190821.014.C2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.108 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 Build/OPD1.170811.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/59.0.3071.125 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 6P Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.83 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 10; HTC Desire 21 pro 5G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.127 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 6.0; HTC One X10 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/61.0.3163.98 Mobile Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+)
+var userAgent = ""
+suspend fun getProfiles(){}
+
+suspend fun shuffleUserAgent(){
+    userAgent = userAgents.shuffled().first()
+    delay(5.minutes)
 }
+
 suspend fun restart(){
     while (true) {
-        val users2 = getOtherPages()
-        val userDetails = users2.get()
-        userDetails.forEach {
-            table.create(it.map())
+        val usersAndId = getOtherPages()
+        usersAndId.forEach {
+            val credential = credentials[index]
+            getUserDetails(it.id, credential){ user ->
+                table.create(user.map())
+            }
         }
-        println("Page $page done....")
-        println("Delaying for 1 minute")
-        delay(1.minutes)
+
+        println("Done with page")
     }
 }
 
-suspend fun List<UserAndId>.get() = coroutineScope {
-    val credential = credentials[index]
-    println("Using ${credential.name}'s account for user details")
-    val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
-    incrementIndex()
-    return@coroutineScope users
-}
+//suspend fun List<UserAndId>.get() = coroutineScope {
+//    val credential = credentials[index]
+//    println("Using ${credential.name}'s account for user details")
+//    val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
+//    incrementIndex()
+//    return@coroutineScope users
+//}
 
-suspend fun getUserDetails(userId: String, credential: Credentials):User {
-    //delay(1000)
+suspend fun getUserDetails(userId: String, credential: Credentials, block: suspend (User) -> Unit) {
+    delay(2000)
     val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
         header("x-ig-app-id", credential.appId)
         header(
             "cookie", "sessionid=${credential.sessionId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
         )
         header("x-csrftoken", credential.crfToken)
+        userAgent(userAgent)
     }
-    return if (!response.status.isSuccess()){
+    if (!response.status.isSuccess()){
         val error = response.bodyAsText()
         println(error)
         credentials.dropAt(index)
         index = 0
-        getUserDetails(userId, credentials.get(index))
+        getUserDetails(userId, credentials.get(index), block)
     }else {
         try {
             val userResponse = response.body<UserResponse>()
-            userResponse.user
+            block(userResponse.user)
         }catch (e: Exception){
             println(response.bodyAsText())
             credentials.dropAt(index)
             index = 0
-            getUserDetails(userId, credentials.get(index))
+            getUserDetails(userId, credentials.get(index), block)
         }
 
     }
@@ -145,8 +151,7 @@ suspend fun getOtherPages(): List<UserAndId> {
             "sessionid=${credential.sessionId}; ds_user_id=${credential.userId}; csrftoken=${credential.crfToken}"
         )
         header("x-csrftoken", credential.crfToken)
-        header("authority", "www.instagram.com")
-        header("referer", "https://www.instagram.com/")
+        userAgent(userAgent)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
