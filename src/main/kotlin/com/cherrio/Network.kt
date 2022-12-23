@@ -46,6 +46,7 @@ import kotlin.time.ExperimentalTime
 //
 //}
 
+//https://www.vpngate.net/api/iphone/
 
 suspend fun getCompanyDetails(list: Pair<String, String>, area: String): Oyo{
     val response = client.get("https://www.businesslist.com.ng${list.second}").bodyAsText()
