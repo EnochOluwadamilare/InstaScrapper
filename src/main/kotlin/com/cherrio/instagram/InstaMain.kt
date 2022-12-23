@@ -71,7 +71,7 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 }
 
 suspend fun getUserDetails(userId: String, credential: Credentials):User {
-    delay(1000)
+    //delay(1000)
     val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
         header("x-ig-app-id", credential.appId)
         header(
