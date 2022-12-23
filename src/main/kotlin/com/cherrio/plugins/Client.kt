@@ -1,13 +1,17 @@
 package com.cherrio.plugins
 
 import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.ProxyBuilder.http
 import io.ktor.client.engine.cio.*
 import io.ktor.client.engine.java.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.network.sockets.*
 import io.ktor.serialization.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import java.net.Proxy
 
 val client = HttpClient(Java){
     BrowserUserAgent()
@@ -17,6 +21,9 @@ val client = HttpClient(Java){
             isLenient = true
             prettyPrint = true
         })
+    }
+    engine {
+        proxy = ProxyBuilder.http("http://50.233.228.147:8080/")
     }
 }
 

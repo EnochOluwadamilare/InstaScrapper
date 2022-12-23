@@ -58,7 +58,7 @@ suspend fun restart(){
         }
         println("Page $page done....")
         println("Delaying for 1 minute")
-        delay(2.minutes)
+        delay(1.minutes)
     }
 }
 
