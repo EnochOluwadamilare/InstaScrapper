@@ -22,9 +22,6 @@ val client = HttpClient(Java){
             prettyPrint = true
         })
     }
-    engine {
-        proxy = ProxyBuilder.http("http://50.233.228.147:8080/")
-    }
 }
 
 inline fun <T> doNetworkCall(block: () -> Resource<T>): Resource<T> {
