@@ -56,28 +56,25 @@ suspend fun shuffleUserAgent(){
 suspend fun restart(){
     while (true) {
         val usersAndId = getOtherPages()
-        usersAndId.forEach {
-            val credential = credentials[index]
-            println("Using ${credential.name}'s account for user details")
-            getUserDetails(it.id, credential){ user ->
-                table.create(user.map())
-            }
+        delay(10000)
+        val users = usersAndId.get()
+        users.forEach {
+                table.create(it.map())
         }
-
-        println("Done with page")
+        println("Done with page $page")
+        delay(2.minutes)
     }
 }
 
-//suspend fun List<UserAndId>.get() = coroutineScope {
-//    val credential = credentials[index]
-//    println("Using ${credential.name}'s account for user details")
-//    val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
-//    incrementIndex()
-//    return@coroutineScope users
-//}
+suspend fun List<UserAndId>.get() = coroutineScope {
+    val credential = credentials[index]
+    println("Using ${credential.name}'s account for user details")
+    val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
+    incrementIndex()
+    return@coroutineScope users
+}
 
-suspend fun getUserDetails(userId: String, credential: Credentials, block: suspend (User) -> Unit) {
-    delay(2000)
+suspend fun getUserDetails(userId: String, credential: Credentials):User {
     val response = client.get("https://www.instagram.com/api/v1/users/$userId/info") {
         header("x-ig-app-id", credential.appId)
         header(
@@ -85,21 +82,21 @@ suspend fun getUserDetails(userId: String, credential: Credentials, block: suspe
         )
         header("x-csrftoken", credential.crfToken)
     }
-    if (!response.status.isSuccess()){
+    return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
         println(error)
         credentials.dropAt(index)
         index = 0
-        getUserDetails(userId, credentials.get(index), block)
+        getUserDetails(userId, credentials.get(index))
     }else {
         try {
             val userResponse = response.body<UserResponse>()
-            block(userResponse.user)
+            userResponse.user
         }catch (e: Exception){
             println(response.bodyAsText())
             credentials.dropAt(index)
             index = 0
-            getUserDetails(userId, credentials.get(index), block)
+            getUserDetails(userId, credentials.get(index))
         }
 
     }
