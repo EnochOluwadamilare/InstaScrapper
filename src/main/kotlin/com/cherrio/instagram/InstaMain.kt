@@ -79,7 +79,6 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
         )
         header("x-csrftoken", credential.crfToken)
     }
-    println(response.bodyAsText())
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
         println(error)
@@ -87,8 +86,16 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
         index = 0
         getUserDetails(userId, credentials.get(index))
     }else {
-        val userResponse = response.body<UserResponse>()
-        userResponse.user
+        try {
+            val userResponse = response.body<UserResponse>()
+            userResponse.user
+        }catch (e: Exception){
+            println(response.bodyAsText())
+            credentials.dropAt(index)
+            index = 0
+            getUserDetails(userId, credentials.get(index))
+        }
+
     }
 }
 
