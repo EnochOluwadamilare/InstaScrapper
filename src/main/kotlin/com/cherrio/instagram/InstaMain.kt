@@ -67,6 +67,7 @@ suspend fun restart(){
                 table.create(it.map())
         }
         println("Done with page $page")
+        delay(15.minutes)
     }
 }
 
