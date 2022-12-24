@@ -108,9 +108,6 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
     }
 }
 
-suspend fun reauthenticate(){
-    val response = client.post("")
-}
 suspend fun runEveryRandomSeconds(block: suspend () -> User): User {
     val random = Random
     val delay = random.nextLong(3,16)
@@ -146,7 +143,7 @@ suspend fun runEveryRandomSeconds(block: suspend () -> User): User {
 //}
 
 suspend fun getOtherPages(): List<UserAndId> {
-    val credential = credentials[1]
+    val credential = credentials[index]
     println("Using ${credential.name}'s account for page")
     val response = client.submitForm(
         url = "https://www.instagram.com/api/v1/tags/$tag/sections/",
