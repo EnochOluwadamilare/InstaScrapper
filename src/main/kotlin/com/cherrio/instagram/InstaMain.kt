@@ -57,7 +57,7 @@ suspend fun shuffleUserAgent(){
 suspend fun restart(){
     while (true) {
         val usersAndId = getOtherPages()
-        val credential = credentials[0]
+        val credential = credentials[index]
         usersAndId.forEach {
             val user =  runEveryRandomSeconds { getUserDetails(it.id,credential) }
             table.create(user.map())
@@ -71,7 +71,7 @@ suspend fun restart(){
 }
 
 suspend fun List<UserAndId>.get() = coroutineScope {
-    val credential = credentials[0]
+    val credential = credentials[index]
     println("Using ${credential.name}'s account for user details")
     val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
     incrementIndex()
@@ -85,6 +85,7 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
             "cookie", "sessionid=${credential.sessionId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
         )
         header("x-csrftoken", credential.crfToken)
+        header("ig_did",credential.deviceId)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -100,7 +101,7 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
             println(response.bodyAsText())
             credentials.dropAt(index)
             index = 0
-            getUserDetails(userId, credentials.get(index))
+            getUserDetails(userId, credentials[index])
         }
 
     }
@@ -158,6 +159,8 @@ suspend fun getOtherPages(): List<UserAndId> {
             "sessionid=${credential.sessionId}; ds_user_id=${credential.userId}; csrftoken=${credential.crfToken}"
         )
         header("x-csrftoken", credential.crfToken)
+        header("ig_did",credential.deviceId)
+
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -222,7 +225,8 @@ data class Credentials(
     val userId: String,
     val crfToken: String,
     val appId: String,
-    val name: String
+    val name: String,
+    val deviceId: String
 )
 
 @Serializable
