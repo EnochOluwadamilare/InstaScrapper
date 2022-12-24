@@ -67,7 +67,7 @@ suspend fun restart(){
 }
 
 suspend fun List<UserAndId>.get() = coroutineScope {
-    val credential = credentials[index]
+    val credential = credentials[0]
     println("Using ${credential.name}'s account for user details")
     val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
     incrementIndex()
@@ -75,7 +75,7 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 }
 
 suspend fun getUserDetails(userId: String, credential: Credentials):User {
-    val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
+    val response = client.get("https://www.instagram.com/api/v1/users/$userId/info") {
         header("x-ig-app-id", credential.appId)
         header(
             "cookie", "sessionid=${credential.sessionId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
@@ -130,7 +130,7 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
 //}
 
 suspend fun getOtherPages(): List<UserAndId> {
-    val credential = credentials[index]
+    val credential = credentials[1]
     println("Using ${credential.name}'s account for page")
     val response = client.submitForm(
         url = "https://www.instagram.com/api/v1/tags/$tag/sections/",
