@@ -57,15 +57,15 @@ suspend fun shuffleUserAgent(){
 suspend fun restart(){
     while (true) {
         val usersAndId = getOtherPages()
-        val credential = credentials[index]
-        usersAndId.forEach {
-            val user =  runEveryRandomSeconds { getUserDetails(it.id,credential) }
-            table.create(user.map())
-        }
-//        val users = usersAndId.get()
-//        users.forEach {
-//                table.create(it.map())
+//        val credential = credentials[index]
+//        usersAndId.forEach {
+//            val user =  runEveryRandomSeconds { getUserDetails(it.id,credential) }
+//            table.create(user.map())
 //        }
+        val users = usersAndId.get()
+        users.forEach {
+                table.create(it.map())
+        }
         println("Done with page $page")
     }
 }
@@ -82,10 +82,9 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
     val response = client.get("https://www.instagram.com/api/v1/users/$userId/info") {
         header("x-ig-app-id", credential.appId)
         header(
-            "cookie", "sessionid=${credential.sessionId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
+            "cookie", "sessionid=${credential.sessionId}; ig_did=${credential.deviceId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
         )
         header("x-csrftoken", credential.crfToken)
-        header("ig_did",credential.deviceId)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -156,10 +155,9 @@ suspend fun getOtherPages(): List<UserAndId> {
         header("x-ig-app-id", credential.appId)
         header(
             "cookie",
-            "sessionid=${credential.sessionId}; ds_user_id=${credential.userId}; csrftoken=${credential.crfToken}"
+            "sessionid=${credential.sessionId}; ig_did=${credential.deviceId}; ds_user_id=${credential.userId}; csrftoken=${credential.crfToken}"
         )
         header("x-csrftoken", credential.crfToken)
-        header("ig_did",credential.deviceId)
 
     }
     return if (!response.status.isSuccess()){
