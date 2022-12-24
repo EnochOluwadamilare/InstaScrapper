@@ -75,7 +75,7 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 }
 
 suspend fun getUserDetails(userId: String, credential: Credentials):User {
-    val response = client.get("https://www.instagram.com/api/v1/users/$userId/info") {
+    val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
         header("x-ig-app-id", credential.appId)
         header(
             "cookie", "sessionid=${credential.sessionId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
