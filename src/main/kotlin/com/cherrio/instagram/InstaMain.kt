@@ -67,7 +67,7 @@ suspend fun restart(){
                 table.create(it.map())
         }
         println("Done with page $page")
-        delay(15.minutes)
+        delay(1.minutes)
     }
 }
 
@@ -80,6 +80,7 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 }
 
 suspend fun getUserDetails(userId: String, credential: Credentials):User {
+    delay(1000)
     val response = client.get("https://i.instagram.com/api/v1/users/$userId/info") {
         header("x-ig-app-id", credential.appId)
         header(
