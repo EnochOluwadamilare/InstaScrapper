@@ -16,6 +16,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
 var maxId = ""
@@ -56,13 +57,16 @@ suspend fun shuffleUserAgent(){
 suspend fun restart(){
     while (true) {
         val usersAndId = getOtherPages()
-        delay(10000)
-        val users = usersAndId.get()
-        users.forEach {
-                table.create(it.map())
+        val credential = credentials[0]
+        usersAndId.forEach {
+            val user =  runEveryRandomSeconds { getUserDetails(it.id,credential) }
+            table.create(user.map())
         }
+//        val users = usersAndId.get()
+//        users.forEach {
+//                table.create(it.map())
+//        }
         println("Done with page $page")
-        delay(2.minutes)
     }
 }
 
@@ -100,6 +104,12 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
         }
 
     }
+}
+suspend fun runEveryRandomSeconds(block: suspend () -> User): User {
+    val random = Random
+    val delay = random.nextLong(3,16)
+    delay(delay * 1000L)
+    return block()
 }
 
 //private suspend fun getFirstPage(): List<UserAndId> {

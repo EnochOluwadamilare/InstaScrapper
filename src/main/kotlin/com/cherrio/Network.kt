@@ -9,12 +9,14 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import org.jsoup.Jsoup
+import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 
 
@@ -48,10 +50,13 @@ import kotlin.time.ExperimentalTime
 
 //https://www.vpngate.net/api/iphone/
 
-suspend fun getCompanyDetails(list: Pair<String, String>, area: String): Oyo{
+
+
+
+suspend fun getCompanyDetails(list: Pair<String, String>, area: String): Oyo {
     val response = client.get("https://www.businesslist.com.ng${list.second}").bodyAsText()
     val parsed = Jsoup.parse(response).select(".info")
-    val companyManager = parsed.find { it.text().contains("Company manager") }?.text()?.replace("Company manager","")
+    val companyManager = parsed.find { it.text().contains("Company manager") }?.text()?.replace("Company manager", "")
     val sector = parsed.select(".product .product_name").map { prod -> prod.text() }.ifEmpty { listOf("None") }
     var address = ""
     var phone1 = ""
@@ -59,16 +64,16 @@ suspend fun getCompanyDetails(list: Pair<String, String>, area: String): Oyo{
     var website = ""
     parsed.select(".text").forEach {
         val text = it.text()
-        if (!text.startsWith("Send")){
-            when{
-                address.isEmpty() -> address = text.replace("View Map","")
+        if (!text.startsWith("Send")) {
+            when {
+                address.isEmpty() -> address = text.replace("View Map", "")
                 (text.startsWith("+") || text.startsWithDigit()) && phone1.isEmpty() -> phone1 = text
                 (text.startsWith("+") || text.startsWithDigit()) && phone1 != text -> phone2 = text
                 text.startsWith("http") && website.isEmpty() -> website = text
             }
-        }else return@forEach
+        } else return@forEach
     }
-    val phones = listOf(phone1,phone2)
+    val phones = listOf(phone1, phone2)
     println("Gotten for: ${list.first} Contact: $companyManager, Address: $address, Phones: $phones")
     return Oyo(
         name = list.first,
@@ -81,7 +86,7 @@ suspend fun getCompanyDetails(list: Pair<String, String>, area: String): Oyo{
     )
 }
 
-suspend fun getCompanyByLocation(location: String, page: Int = 1): List<Pair<String, String>>{
+suspend fun getCompanyByLocation(location: String, page: Int = 1): List<Pair<String, String>> {
     val response = client.get("https://www.businesslist.com.ng/location/$location/$page").bodyAsText()
     val parsed = Jsoup.parse(response).select(".company")
     return parsed.map {
@@ -103,22 +108,25 @@ data class Oyo(
     val area: String
 )
 
-fun String?.ifNull(block: () -> String): String{
+fun String?.ifNull(block: () -> String): String {
     return this ?: block()
 }
-fun String.startsWithDigit():Boolean{
+
+fun String.startsWithDigit(): Boolean {
     return get(0).isDigit()
 }
 
-inline fun <reified T> getP1(): Set<String>{
+inline fun <reified T> getP1(): Set<String> {
     val params = T::class.java.declaredFields.map { it.name }
     //val ann = T::class.java.declaredAnnotations.map { it.annotationClass.simpleName }
     return params.toSet()
 }
-inline fun <reified T> getP2(): Set<String>{
+
+inline fun <reified T> getP2(): Set<String> {
     val f = T::class.java.getDeclaredConstructor().newInstance()
     return json.encodeToJsonElement(f).jsonObject.keys
 }
+
 @Serializable
 data class User(
     val id: Int,
