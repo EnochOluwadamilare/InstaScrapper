@@ -79,12 +79,13 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 }
 
 suspend fun getUserDetails(userId: String, credential: Credentials):User {
-    val response = client.get("https://www.instagram.com/api/v1/users/$userId/info") {
+    val response = client.get("https://i.instagram.com/api/v1/users/$userId/info") {
         header("x-ig-app-id", credential.appId)
         header(
             "cookie", "sessionid=${credential.sessionId}; ig_did=${credential.deviceId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
         )
         header("x-csrftoken", credential.crfToken)
+        header("x-requested-with","XMLHttpRequest")
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -104,6 +105,10 @@ suspend fun getUserDetails(userId: String, credential: Credentials):User {
         }
 
     }
+}
+
+suspend fun reauthenticate(){
+    val response = client.post("")
 }
 suspend fun runEveryRandomSeconds(block: suspend () -> User): User {
     val random = Random
