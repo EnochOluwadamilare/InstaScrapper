@@ -46,7 +46,7 @@ val userAgents = setOf(
     "Mozilla/5.0 (Linux; Android 6.0; HTC One X10 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/61.0.3163.98 Mobile Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
 )
-var userAgent = ""
+var userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
 suspend fun getProfiles(){}
 
 suspend fun shuffleUserAgent(){
@@ -81,13 +81,16 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 
 suspend fun getUserDetails(userId: String, credential: Credentials):User {
     delay(1000)
-    val response = client.get("https://i.instagram.com/api/v1/users/$userId/info") {
+    val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
         header("x-ig-app-id", credential.appId)
         header(
             "cookie", "sessionid=${credential.sessionId}; ig_did=${credential.deviceId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
         )
         header("x-csrftoken", credential.crfToken)
         header("x-requested-with","XMLHttpRequest")
+        header("sec-ch-ua-platform", "macOS")
+        header("sec-ch-ua", """Not?A_Brand";v="8", "Chromium";v="108", "Brave";v="108""")
+        userAgent(userAgent)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
