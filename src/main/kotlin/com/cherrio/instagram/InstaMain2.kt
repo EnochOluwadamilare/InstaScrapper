@@ -8,11 +8,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import java.nio.file.Paths
+import kotlin.math.log
 
 
 fun login() {
     Playwright.create().use { playwright ->
-        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
+        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
         val context = browser.newContext()
         val page: Page = context.newPage()
         page.navigate("https://www.instagram.com/")
