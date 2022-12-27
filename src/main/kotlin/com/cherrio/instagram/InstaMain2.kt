@@ -12,7 +12,7 @@ import java.nio.file.Paths
 
 fun login() {
     Playwright.create().use { playwright ->
-        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
+        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
         val context = browser.newContext()
         val page: Page = context.newPage()
         page.navigate("https://www.instagram.com/")
