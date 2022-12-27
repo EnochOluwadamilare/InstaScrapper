@@ -28,7 +28,7 @@ val sheetDb = SheetsDb {
         "ya29.a0AeTM1idDgIb_hy9Fv_tJ16dlS2pUAjCwiugdWPblYOhlAEvm3yNRYvh4wuCpzLx_CaCyaqeqCUnrw_Ec8C2uE2r6VTygWzwB8tYm3c4jBVcyLXKG8PIRvTxFexqHgBXCVu2hHmiZQLv1Ka_BpiznlQxaA5mz-x0nTgaCgYKAeISAQASFQHWtWOmyqT0Rt1DeXUGJzm1EoNiXw0169"
     sheetId = "1YmBiVCmYn2fn15wmmy_Ex6aOGNyC5wv991vTAZkZby8"
 }
-var table = sheetDb.getTable<LagosBusinessHub>()
+var table = sheetDb.getTable<Asoebi>()
 
 var credentials = listOf<Credentials>()
 var index = 0
@@ -201,7 +201,7 @@ fun List<Credentials>.dropAt(pos: Int){
 }
 
 fun User.map() =
-    LagosBusinessHub(
+    Asoebi(
         username = username,
         profileUrl = "https://www.instagram.com/$username",
         fullName = fullName,
@@ -235,7 +235,7 @@ data class Credentials(
 )
 
 @Serializable
-data class LagosBusinessHub(
+data class Asoebi(
     @SerialName("username")
     val username: String,
     @SerialName("profile_url")

@@ -29,6 +29,15 @@ fun Route.restarting(){
         credentials = creds.credentials
         call.respond(HttpStatusCode.OK, "Details set")
     }
+    get("/login"){
+        login()
+        call.respond(HttpStatusCode.OK, "Logged In")
+    }
+    get("/begin"){
+        val tag = call.parameters["tag"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Provide tag")
+        begin(tag)
+        call.respond(HttpStatusCode.OK, "Begin")
+    }
 }
 
 @Serializable

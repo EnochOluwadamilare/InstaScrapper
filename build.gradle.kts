@@ -40,6 +40,11 @@ dependencies {
     implementation("io.github.cherrio-llc:sheets-db:0.0.2")
     implementation(libs.jsoup)
 
+    implementation("org.seleniumhq.selenium:selenium-java:4.7.1")
+    implementation("io.github.bonigarcia:webdrivermanager:5.3.1")
+
+    implementation("com.microsoft.playwright:playwright:1.27.0")
+
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
