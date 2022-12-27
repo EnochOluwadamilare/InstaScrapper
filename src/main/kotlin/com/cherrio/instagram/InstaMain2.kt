@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import java.nio.file.Paths
+import kotlin.io.path.writeText
 import kotlin.math.log
 
 
@@ -24,16 +25,18 @@ fun login() {
         page.locator("[name='password']").fill("Ayodele4_")
         page.locator("[type='submit']").click()
 
-        page.getByText("Save information").first().click()
-
-        page.onPopup {
-            it.getByText("Not Now").first().click()
-        }
+//        page.getByText("Save information").first().click()
+//
+//        page.onPopup {
+//            it.getByText("Not Now").first().click()
+//        }
 
         page.getByText("Search").first().click()
         page.locator("[placeholder='Search']").fill("#lagosvendors")
 
         context.storageState(BrowserContext.StorageStateOptions().setPath(Paths.get("state.json")))
+
+        println("Done")
     }
 }
 
