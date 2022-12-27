@@ -9,14 +9,16 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import java.nio.file.Paths
 
+
 fun login() {
     Playwright.create().use { playwright ->
-        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
+        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
         val context = browser.newContext()
         val page: Page = context.newPage()
         page.navigate("https://www.instagram.com/")
         println(page.title())
 
+        println("Logging in")
         page.locator("[name='username']").fill("jazzedayo@gmail.com")
         page.locator("[name='password']").fill("Ayodele4_")
         page.locator("[type='submit']").click()

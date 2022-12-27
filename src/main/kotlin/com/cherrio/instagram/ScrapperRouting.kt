@@ -30,13 +30,13 @@ fun Route.restarting(){
         call.respond(HttpStatusCode.OK, "Details set")
     }
     get("/login"){
-        login()
         call.respond(HttpStatusCode.OK, "Logged In")
+        login()
     }
     get("/begin"){
         val tag = call.parameters["tag"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Provide tag")
-        begin(tag)
         call.respond(HttpStatusCode.OK, "Begin")
+        begin(tag)
     }
 }
 
