@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.7.20"
     id("io.ktor.plugin") version "2.1.2"
     kotlin("plugin.serialization") version "1.7.20"
+    id("com.google.cloud.tools.jib") version "3.2.1"
 }
 
 group = "com.cherrio"
@@ -21,6 +22,21 @@ application {
 repositories {
     mavenLocal()
     mavenCentral()
+}
+
+jib {
+    from{
+        image = "mcr.microsoft.com/playwright/java:v1.27.0-focal"
+    }
+    to {
+        auth {
+            //aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/a9a1h7h4
+            //val registryUserName = project.findProperty("registryUserName") as String? ?: ""
+            //val registryPassword = project.findProperty("registryPassword") as String? ?: ""
+            username = "cherrio20"
+            password = "Development@2020_"
+        }
+    }
 }
 
 dependencies {
@@ -39,9 +55,6 @@ dependencies {
     implementation("io.ktor:ktor-server-call-logging-jvm:2.1.2")
     implementation("io.github.cherrio-llc:sheets-db:0.0.2")
     implementation(libs.jsoup)
-
-    implementation("org.seleniumhq.selenium:selenium-java:4.7.1")
-    implementation("io.github.bonigarcia:webdrivermanager:5.3.1")
 
     implementation("com.microsoft.playwright:playwright:1.27.0")
 
