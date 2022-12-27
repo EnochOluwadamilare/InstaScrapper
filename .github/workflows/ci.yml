@@ -7,6 +7,7 @@ on:
 jobs:
   release:
     name: Push to DockerHub
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
