@@ -24,19 +24,23 @@ fun Route.restarting(){
         restart()
 
     }
+    get("/refresh"){
+        refreshCookie()
+        call.respond(HttpStatusCode.OK,"Refreshed")
+    }
     get("/set-details"){
        val creds = call.receive<Creds>()
         credentials = creds.credentials
         call.respond(HttpStatusCode.OK, "Details set")
     }
     get("/login"){
-        call.respond(HttpStatusCode.OK, "Logged In")
-        login()
+        call.respond(HttpStatusCode.OK, login())
     }
     get("/begin"){
         val tag = call.parameters["tag"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Provide tag")
+        val username = call.parameters["username"] ?: ""
         call.respond(HttpStatusCode.OK, "Begin")
-        begin(tag)
+        begin(tag, username)
     }
 }
 

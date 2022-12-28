@@ -3,6 +3,7 @@ package com.cherrio.instagram
 import com.cherrio.ifNull
 import com.cherrio.instagram.models.*
 import com.cherrio.plugins.client
+import com.cherrio.sheetsdb.client.json
 import com.cherrio.sheetsdb.database.create
 import com.cherrio.sheetsdb.init.SheetsDb
 import com.cherrio.sheetsdb.init.getTable
@@ -15,13 +16,17 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import java.nio.file.Paths
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.readText
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
 var maxId = ""
 var page = 0
-val tag = "lagosbusinesshub"
+val tag = "asoebi"
 
 val sheetDb = SheetsDb {
     bearerToken =
@@ -47,7 +52,7 @@ val userAgents = setOf(
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
 )
 var userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-suspend fun getProfiles(){}
+var cooky: Cookies? = null
 
 suspend fun shuffleUserAgent(){
     userAgent = userAgents.shuffled().first()
@@ -57,11 +62,6 @@ suspend fun shuffleUserAgent(){
 suspend fun restart(){
     while (true) {
         val usersAndId = getOtherPages()
-//        val credential = credentials[index]
-//        usersAndId.forEach {
-//            val user =  runEveryRandomSeconds { getUserDetails(it.id,credential) }
-//            table.create(user.map())
-//        }
         val users = usersAndId.get()
         users.forEach {
                 table.create(it.map())
@@ -71,46 +71,58 @@ suspend fun restart(){
     }
 }
 
+suspend fun refreshCookie(){
+    val railway = System.getenv("RAILWAY")
+    cooky = if (railway != null){
+        client.get("http://instascrapper-env.eba-yjypcynj.us-east-1.elasticbeanstalk.com/login").body()
+    }else{
+        login().toCookies()
+    }
+}
+
 suspend fun List<UserAndId>.get() = coroutineScope {
-    val credential = credentials[index]
-    println("Using ${credential.name}'s account for user details")
-    val users = map { async { getUserDetails(it.id, credential) } }.awaitAll()
+    val users = map { async { getUserDetails(it.id) } }.awaitAll()
     incrementIndex()
     return@coroutineScope users
 }
 
-suspend fun getUserDetails(userId: String, credential: Credentials):User {
+suspend fun getUserDetails(userId: String):User {
     delay(1000)
+    val cookie = cooky!!.cookies.joinToString("; ") { "${it.name}=${it.value}" }
+
     val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
-        header("x-ig-app-id", credential.appId)
+        header("x-ig-app-id", "936619743392459")
         header(
-            "cookie", "sessionid=${credential.sessionId}; ig_did=${credential.deviceId}; csrftoken=${credential.crfToken}; ds_user_id=${credential.userId}"
+            "cookie", cookie
         )
-        header("x-csrftoken", credential.crfToken)
-        header("x-requested-with","XMLHttpRequest")
-        header("sec-ch-ua-platform", "macOS")
-        header("sec-ch-ua", """Not?A_Brand";v="8", "Chromium";v="108", "Brave";v="108""")
-        userAgent(userAgent)
+        header("x-csrftoken", cooky!!.cookies.find { it.name == "csrftoken" }!!.value)
+//        header("x-requested-with","XMLHttpRequest")
+//        header("sec-ch-ua-platform", "macOS")
+//        header("sec-ch-ua", """Not?A_Brand";v="8", "Chromium";v="108", "Brave";v="108""")
+//        userAgent(userAgent)
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        println(error)
-        credentials.dropAt(index)
-        index = 0
-        getUserDetails(userId, credentials.get(index))
+        if (error.contains("require_login")){
+            val newCooky = login().toCookies()
+            getUserDetails(userId)
+        }else{
+            throw Exception(error)
+        }
     }else {
         try {
             val userResponse = response.body<UserResponse>()
             userResponse.user
         }catch (e: Exception){
             println(response.bodyAsText())
-            credentials.dropAt(index)
-            index = 0
-            getUserDetails(userId, credentials[index])
+            getUserDetails(userId)
         }
 
     }
 }
+
+fun String.toCookies() = json.decodeFromString<Cookies>(this)
+
 
 suspend fun runEveryRandomSeconds(block: suspend () -> User): User {
     val random = Random
@@ -147,8 +159,8 @@ suspend fun runEveryRandomSeconds(block: suspend () -> User): User {
 //}
 
 suspend fun getOtherPages(): List<UserAndId> {
-    val credential = credentials[index]
-    println("Using ${credential.name}'s account for page")
+    val cookie = cooky!!.cookies.joinToString("; ") { "${it.name}=${it.value}" }
+    println(cookie)
     val response = client.submitForm(
         url = "https://www.instagram.com/api/v1/tags/$tag/sections/",
         formParameters = Parameters.build {
@@ -159,22 +171,21 @@ suspend fun getOtherPages(): List<UserAndId> {
             append("tab", "recent")
         }
     ){
-        header("x-ig-app-id", credential.appId)
+        header("x-ig-app-id", "936619743392459")
         header(
-            "cookie",
-            "sessionid=${credential.sessionId}; ig_did=${credential.deviceId}; ds_user_id=${credential.userId}; csrftoken=${credential.crfToken}"
+            "cookie", cookie
         )
-        header("x-csrftoken", credential.crfToken)
+        header("x-csrftoken", cooky!!.cookies.find { it.name == "csrftoken" }!!.value)
 
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        println(error)
-        credentials.dropAt(index)
-        index = 0
-        getOtherPages()
+        if (error.contains("require_login")){
+            refreshCookie()
+            getOtherPages()
+        }else throw Exception(error)
+
     }else {
-        incrementIndex()
         val body = response.body<Recent>()
         maxId = body.nextMaxId
         page = body.nextPage
@@ -270,3 +281,46 @@ data class Asoebi(
     val city: String,
 )
 
+@Serializable
+data class Cookies(
+    @SerialName("cookies")
+    val cookies: List<Cooky>,
+    @SerialName("origins")
+    val origins: List<Origin>
+)
+
+@Serializable
+data class Cooky(
+    @SerialName("name")
+    val name: String,
+    @SerialName("value")
+    val value: String,
+    @SerialName("domain")
+    val domain: String,
+    @SerialName("path")
+    val path: String,
+    @SerialName("expires")
+    val expires: Double,
+    @SerialName("httpOnly")
+    val httpOnly: Boolean,
+    @SerialName("secure")
+    val secure: Boolean,
+    @SerialName("sameSite")
+    val sameSite: String
+)
+
+@Serializable
+data class Origin(
+    @SerialName("origin")
+    val origin: String,
+    @SerialName("localStorage")
+    val localStorage: List<LocalStorage>
+)
+
+@Serializable
+data class LocalStorage(
+    @SerialName("name")
+    val name: String,
+    @SerialName("value")
+    val value: String
+)

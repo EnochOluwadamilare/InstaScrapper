@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json
 import java.net.Proxy
 
 val client = HttpClient(Java){
+    BrowserUserAgent()
     install(ContentNegotiation){
         json(json = Json { 
             ignoreUnknownKeys = true

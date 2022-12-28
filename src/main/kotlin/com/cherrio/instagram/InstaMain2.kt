@@ -8,11 +8,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import java.nio.file.Paths
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.math.log
 
 
-fun login() {
+fun login(): String {
+    val credentials = listOf(
+        "jazzedayo@gmail.com" to "Ayodele4_",
+        "cherrio.llc@gmail.com" to "Ayodele4_",
+        "elizabethy.keen@gmail.com" to "Elizabeth12_",
+        "donaldy.ressler@gmail.com" to "Donald12_",
+        "ray.redd.reddington@gmail.com" to "Raymond12_",
+    )
+    val (email, password) = credentials.shuffled().first()
+    println("Using: $email")
     Playwright.create().use { playwright ->
         val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
         val context = browser.newContext()
@@ -21,8 +31,8 @@ fun login() {
         println(page.title())
 
         println("Logging in")
-        page.locator("[name='username']").fill("jazzedayo@gmail.com")
-        page.locator("[name='password']").fill("Ayodele4_")
+        page.locator("[name='username']").fill(email)
+        page.locator("[name='password']").fill(password)
         page.locator("[type='submit']").click()
 
 //        page.getByText("Save information").first().click()
@@ -38,26 +48,32 @@ fun login() {
 
         println("Done")
     }
+
+    return Paths.get("state.json").readText()
 }
 
-suspend fun begin(tag: String) {
+var continueWith = false
+suspend fun begin(tag: String, username: String) {
     Playwright.create().use { playwright ->
-        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
+        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
         val context = browser.newContext(Browser.NewContextOptions().setStorageStatePath(Paths.get("state.json")))
         val page: Page = context.newPage()
         page.onResponse {
             if (it.url().contains("api/v1/users")){
                 val user = json.decodeFromString<UserResponse>(it.text()).user
-                runBlocking {
-                    table.create(user.map())
-                }
+//                if (user.username == username || continueWith) {
+//                    continueWith = true
+//                    runBlocking {
+//                        table.create(user.map())
+//                    }
+//                }
             }
         }
         println("Before navigate")
         page.navigate("https://www.instagram.com/explore/tags/$tag/")
 
         //First post
-        page.locator("[class='_aagu']").first().click()
+        val pas = page.locator("[class='_aagu']").first().click()
 
         nextUser(isFirst = true, page = page)
 
