@@ -1,39 +1,53 @@
 package com.cherrio.instagram
 
 import com.cherrio.instagram.models.UserResponse
+import com.cherrio.plugins.client
 import com.cherrio.sheetsdb.client.json
 import com.cherrio.sheetsdb.database.create
 import com.microsoft.playwright.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import java.lang.Exception
 import java.nio.file.Paths
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.math.log
 
 
-fun login(): String {
-    val credentials = listOf(
-        "jazzedayo@gmail.com" to "Ayodele4_",
-        "cherrio.llc@gmail.com" to "Ayodele4_",
-        "elizabethy.keen@gmail.com" to "Elizabeth12_",
-        "donaldy.ressler@gmail.com" to "Donald12_",
-        "ray.redd.reddington@gmail.com" to "Raymond12_",
+fun login(userId: String = ""): String {
+    val creds = listOf(
+        Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
+        Triple("cherrio.llc@gmail.com","Ayodele4_","56978350990"),
+        Triple("elizabethy.keen@gmail.com","Elizabeth12_","57221602232"),
+        Triple("donaldy.ressler@gmail.com","Donald12_","57201108496"),
+        Triple("ray.redd.reddington@gmail.com","Raymond12_","57232760704"),
+        Triple("oaks224@gmail.com","Ayodele12_08_1994","56822524662")
     )
+
+    val credentials = if (userId.isNotEmpty()){
+        sendNotification(creds.find { it.third == userId }!!.first)
+        creds.filter { it.third != userId }
+    }else creds
+
     val (email, password) = credentials.shuffled().first()
     println("Using: $email")
-    Playwright.create().use { playwright ->
-        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
-        val context = browser.newContext()
-        val page: Page = context.newPage()
-        page.navigate("https://www.instagram.com/")
-        println(page.title())
 
-        println("Logging in")
-        page.locator("[name='username']").fill(email)
-        page.locator("[name='password']").fill(password)
-        page.locator("[type='submit']").click()
+    try {
+        Playwright.create().use { playwright ->
+            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
+            val context = browser.newContext()
+            val page: Page = context.newPage()
+            page.navigate("https://www.instagram.com/")
+            println(page.title())
+
+            println("Logging in")
+            page.locator("[name='username']").fill(email)
+            page.locator("[name='password']").fill(password)
+            page.locator("[type='submit']").click()
 
 //        page.getByText("Save information").first().click()
 //
@@ -41,15 +55,30 @@ fun login(): String {
 //            it.getByText("Not Now").first().click()
 //        }
 
-        page.getByText("Search").first().click()
-        page.locator("[placeholder='Search']").fill("#lagosvendors")
+            page.getByText("Search").first().click()
+            page.locator("[placeholder='Search']").fill("#lagosvendors")
 
-        context.storageState(BrowserContext.StorageStateOptions().setPath(Paths.get("state.json")))
+            context.storageState(BrowserContext.StorageStateOptions().setPath(Paths.get("state.json")))
 
-        println("Done")
+            println("Done")
+        }
+    }catch (e: TimeoutError){
+        login(userId)
     }
-
     return Paths.get("state.json").readText()
+}
+
+fun sendNotification(email: String) = runBlocking{
+    val url = "https://hooks.slack.com/services/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"
+    val requestBody = """
+        Lead-NOTIFICATION
+        Email: $email
+    """
+    val request = client.post(url){
+        contentType(ContentType.Application.Json)
+        setBody(SlackRequest(requestBody))
+    }
+    println("Notification: $requestBody with status: ${request.status == HttpStatusCode.OK}")
 }
 
 var continueWith = false
@@ -114,3 +143,8 @@ suspend fun nextUser(isFirst: Boolean = false, page: Page){
     nextUser(page = page)
 
 }
+
+@Serializable
+private data class SlackRequest(
+    val text: String
+)

@@ -71,10 +71,17 @@ suspend fun restart(){
     }
 }
 
-suspend fun refreshCookie(){
+suspend fun refreshCookie(userId: String = ""){
+    //{"message":"checkpoint_required","checkpoint_url":"https://www.instagram.com/challenge/?next=/api/v1/tags/asoebi/sections/","lock":true,"flow_render_type":0,"status":"fail";}
     val railway = System.getenv("RAILWAY")
     cooky = if (railway != null){
-        val loginResponse = client.get("http://instascrapper-env.eba-yjypcynj.us-east-1.elasticbeanstalk.com/login").bodyAsText()
+        val loginResponse = client.get("http://instascrapper-env.eba-yjypcynj.us-east-1.elasticbeanstalk.com/login"){
+            if (userId.isNotEmpty()) {
+                url {
+                    parameters.append("user_id", userId)
+                }
+            }
+        }.bodyAsText()
         println("Login Response")
         println(loginResponse)
         loginResponse.toCookies()
@@ -89,7 +96,7 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 }
 
 suspend fun getUserDetails(userId: String):User {
-    delay(1000)
+    delay(runEveryRandomSeconds())
     val cookie = cooky!!.cookies.joinToString("; ") { "${it.name}=${it.value}" }
 
     val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
@@ -101,12 +108,11 @@ suspend fun getUserDetails(userId: String):User {
 //        header("x-requested-with","XMLHttpRequest")
 //        header("sec-ch-ua-platform", "macOS")
 //        header("sec-ch-ua", """Not?A_Brand";v="8", "Chromium";v="108", "Brave";v="108""")
-//        userAgent(userAgent)
+        userAgent(userAgents.shuffled().first())
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        println(error)
-        refreshCookie()
+        checkPointOrRefresh(error)
         getUserDetails(userId)
     }else {
         try {
@@ -123,11 +129,10 @@ suspend fun getUserDetails(userId: String):User {
 fun String.toCookies() = json.decodeFromString<Cookies>(this)
 
 
-suspend fun runEveryRandomSeconds(block: suspend () -> User): User {
+fun runEveryRandomSeconds(): Long {
     val random = Random
     val delay = random.nextLong(3,16)
-    delay(delay * 1000L)
-    return block()
+    return delay * 1000L
 }
 
 //private suspend fun getFirstPage(): List<UserAndId> {
@@ -179,8 +184,7 @@ suspend fun getOtherPages(): List<UserAndId> {
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        println(error)
-        refreshCookie()
+        checkPointOrRefresh(error)
         getOtherPages()
     }else {
         val body = response.body<Recent>()
@@ -196,6 +200,21 @@ suspend fun getOtherPages(): List<UserAndId> {
     }
 }
 
+suspend fun checkPointOrRefresh(error: String){
+    println(error)
+    when{
+        error.contains("checkpoint_required") ->{
+            refreshCookie(userId = cooky!!.cookies.find { it.name == "ds_user_id"}!!.value)
+        }
+        error.contains("spam") -> {
+            delay(10.minutes)
+            refreshCookie()
+        }
+        else -> {
+            refreshCookie()
+        }
+    }
+}
 fun incrementIndex(){
     if (index == credentials.size - 1) {
         index = 0
