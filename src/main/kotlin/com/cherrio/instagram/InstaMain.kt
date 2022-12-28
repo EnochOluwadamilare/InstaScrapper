@@ -105,12 +105,9 @@ suspend fun getUserDetails(userId: String):User {
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        if (error.contains("require_login")){
-            val newCooky = login().toCookies()
-            getUserDetails(userId)
-        }else{
-            throw Exception(error)
-        }
+        println(error)
+        refreshCookie()
+        getUserDetails(userId)
     }else {
         try {
             val userResponse = response.body<UserResponse>()
@@ -182,11 +179,9 @@ suspend fun getOtherPages(): List<UserAndId> {
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        if (error.contains("require_login")){
-            refreshCookie()
-            getOtherPages()
-        }else throw Exception(error)
-
+        println(error)
+        refreshCookie()
+        getOtherPages()
     }else {
         val body = response.body<Recent>()
         maxId = body.nextMaxId
