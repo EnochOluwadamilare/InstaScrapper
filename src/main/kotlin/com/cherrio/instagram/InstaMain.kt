@@ -36,7 +36,6 @@ val sheetDb = SheetsDb {
 var table = sheetDb.getTable<Asoebi>()
 
 var credentials = listOf<Credentials>()
-var index = 0
 
 val userAndIds = mutableListOf<UserAndId>()
 var times = 0
@@ -216,15 +215,9 @@ suspend fun checkPointOrRefresh(error: String){
         }
     }
 }
-fun incrementIndex(){
-    if (index == credentials.size - 1) {
-        index = 0
-    } else {
-        index++
-    }
-}
+
 fun List<Credentials>.dropAt(pos: Int){
-    println("Dropping ${get(index).name}'s account")
+    //println("Dropping ${get(index).name}'s account")
     credentials = filterIndexed { index, _ -> pos != index }
 }
 

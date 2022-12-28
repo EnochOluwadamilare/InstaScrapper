@@ -17,7 +17,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.math.log
 
-
+var index = 0
 fun login(userId: String = ""): String {
     val creds = listOf(
         Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -25,7 +25,7 @@ fun login(userId: String = ""): String {
         Triple("elizabethy.keen@gmail.com","Elizabeth12_","57221602232"),
         Triple("donaldy.ressler@gmail.com","Donald12_","57201108496"),
         Triple("ray.redd.reddington@gmail.com","Raymond12_","57232760704"),
-        Triple("oaks224@gmail.com","Ayodele12_08_1994","56822524662")
+        Triple("oaks224@gmail.com","Ayodele4_","56822524662")
     )
 
     val credentials = if (userId.isNotEmpty()){
@@ -33,7 +33,7 @@ fun login(userId: String = ""): String {
         creds.filter { it.third != userId }
     }else creds
 
-    val (email, password) = credentials.shuffled().first()
+    val (email, password) = credentials[index]
     println("Using: $email")
 
     try {
@@ -65,7 +65,16 @@ fun login(userId: String = ""): String {
     }catch (e: TimeoutError){
         login(userId)
     }
+    incrementIndex(credentials.size)
     return Paths.get("state.json").readText()
+}
+
+fun incrementIndex(size: Int){
+    if (index == size - 1) {
+        index = 0
+    } else {
+        index++
+    }
 }
 
 fun sendNotification(email: String) = runBlocking{
