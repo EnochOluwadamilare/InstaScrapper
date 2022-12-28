@@ -72,6 +72,7 @@ suspend fun restart(){
 }
 
 suspend fun refreshCookie(userId: String = ""){
+    println("Refreshing...")
     //{"message":"checkpoint_required","checkpoint_url":"https://www.instagram.com/challenge/?next=/api/v1/tags/asoebi/sections/","lock":true,"flow_render_type":0,"status":"fail";}
     val railway = System.getenv("RAILWAY")
     cooky = if (railway != null){
@@ -119,7 +120,7 @@ suspend fun getUserDetails(userId: String):User {
             val userResponse = response.body<UserResponse>()
             userResponse.user
         }catch (e: Exception){
-            println(response.bodyAsText())
+            checkPointOrRefresh(response.bodyAsText())
             getUserDetails(userId)
         }
 
@@ -201,7 +202,7 @@ suspend fun getOtherPages(): List<UserAndId> {
 }
 
 suspend fun checkPointOrRefresh(error: String){
-    println(error)
+    println("checkPointOrRefresh: $error")
     when{
         error.contains("checkpoint_required") ->{
             refreshCookie(userId = cooky!!.cookies.find { it.name == "ds_user_id"}!!.value)
