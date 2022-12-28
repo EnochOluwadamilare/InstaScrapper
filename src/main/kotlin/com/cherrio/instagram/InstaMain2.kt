@@ -64,6 +64,7 @@ fun login(userId: String = ""): String {
             println("Done")
         }
     }catch (e: TimeoutError){
+        incrementIndex(credentials.size)
         println(e.localizedMessage)
         login(userId)
     }
