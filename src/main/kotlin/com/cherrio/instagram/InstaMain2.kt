@@ -13,11 +13,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import java.lang.Exception
 import java.nio.file.Paths
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.math.log
 
 var index = 0
+
 fun login(userId: String = ""): String {
     val creds = listOf(
         Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -35,10 +37,9 @@ fun login(userId: String = ""): String {
 
     val (email, password) = credentials[index]
     println("Using: $email")
-
     try {
         Playwright.create().use { playwright ->
-            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
+            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
             val context = browser.newContext()
             val page: Page = context.newPage()
             page.navigate("https://www.instagram.com/")
@@ -61,10 +62,12 @@ fun login(userId: String = ""): String {
             context.storageState(BrowserContext.StorageStateOptions().setPath(Paths.get("state.json")))
 
             println("Done")
+
         }
     }catch (e: TimeoutError){
         incrementIndex(credentials.size)
         println(e.localizedMessage)
+        Paths.get("state.json").deleteIfExists()
     }
     incrementIndex(credentials.size)
     return Paths.get("state.json").readText()

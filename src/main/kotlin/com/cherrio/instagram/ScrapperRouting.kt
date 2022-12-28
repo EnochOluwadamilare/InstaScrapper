@@ -16,8 +16,8 @@ fun Application.scrapperRouting(){
 fun Route.restarting(){
     get("/restart"){
         val params = call.parameters
-        val _maxId = params["max_id"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Provide max_ID")
-        val _page = params["page"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Provide page")
+        val _maxId = params["max_id"] ?: maxId
+        val _page = params["page"] ?: page.toString()
         maxId = _maxId
         page = _page.toInt()
         call.respond(HttpStatusCode.OK, "Scrapping restarted")
@@ -39,10 +39,8 @@ fun Route.restarting(){
         call.respond(HttpStatusCode.OK, login(username))
     }
     get("/begin"){
-        val tag = call.parameters["tag"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Provide tag")
-        val username = call.parameters["username"] ?: ""
+        index = 0
         call.respond(HttpStatusCode.OK, "Begin")
-        begin(tag, username)
     }
 }
 

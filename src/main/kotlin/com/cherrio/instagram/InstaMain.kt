@@ -17,10 +17,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import java.nio.file.Paths
 import java.util.*
-import kotlin.io.path.Path
-import kotlin.io.path.readText
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
@@ -108,7 +105,7 @@ suspend fun getUserDetails(userId: String):User {
 //        header("x-requested-with","XMLHttpRequest")
 //        header("sec-ch-ua-platform", "macOS")
 //        header("sec-ch-ua", """Not?A_Brand";v="8", "Chromium";v="108", "Brave";v="108""")
-        userAgent(userAgents.shuffled().first())
+        //userAgent(userAgents.shuffled().first())
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
@@ -270,25 +267,25 @@ data class Asoebi(
     @SerialName("following")
     val following: Int,
     @SerialName("bio")
-    val bio: String,
+    val bio: String = "None",
     @SerialName("email")
     val email: String,
     @SerialName("country_code")
-    val countryCode: String,
+    val countryCode: String = "None",
     @SerialName("phone")
-    val phone: String,
+    val phone: String = "None",
     @SerialName("is_business")
     val isBusiness: String,
     @SerialName("page_name")
     val pageName: String,
     @SerialName("whatsapp_number")
-    val whatsappNumber: String,
+    val whatsappNumber: String = "None",
     @SerialName("url")
-    val url: String,
+    val url: String = "None",
     @SerialName("address")
-    val address: String,
+    val address: String = "None",
     @SerialName("city")
-    val city: String,
+    val city: String? = "None",
 )
 
 @Serializable

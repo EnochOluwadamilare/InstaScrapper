@@ -1,5 +1,6 @@
 package com.cherrio
 
+import com.cherrio.instagram.login
 import com.cherrio.instagram.scrapperRouting
 import io.ktor.server.application.*
 import com.cherrio.plugins.*
@@ -8,10 +9,12 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.time.delay
 import kotlinx.serialization.json.Json
 import java.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
@@ -30,7 +33,6 @@ fun Application.module() {
             }
         }
     }
-
 }
 
 fun Application.configureSerialization() {

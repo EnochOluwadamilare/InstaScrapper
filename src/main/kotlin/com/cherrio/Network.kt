@@ -1,22 +1,26 @@
 package com.cherrio
 
-import com.cherrio.instagram.models.UserResponse
 import com.cherrio.sheetsdb.client.json
 import com.cherrio.sheetsdb.database.*
 import com.microsoft.playwright.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
-import java.nio.file.Paths
-import java.util.regex.Pattern
 
 
+//fun main()= runBlocking{
+//    val sheetDb = SheetsDb {
+//        bearerToken =
+//            "ya29.a0AX9GBdVxEpavvtoVrgDlBe9Amn_GmS-9MCYGkg6nHow60eYrM3-9tNWcXHg-0glkW_2ad6Y0nqoyb_ucEmecMnA5McSISjsMnzfpxpAWRZ3PEH5iGbNXbfWloFrMJnu0t7hPEC4RRy41jtz2NGg5QQkqP5hX0eCSHQaCgYKAc8SAQASFQHUCsbCxdg_VixTvtXyVMAqP-QGSA0169"
+//        sheetId = "1YmBiVCmYn2fn15wmmy_Ex6aOGNyC5wv991vTAZkZby8"
+//    }
+//    val table = sheetDb.getTable<IbadanVendors>()
+//    val customers = table.get()
+//    println(customers.distinctBy { it.username }.filter { it.mediaCount >= 50 && it.followers >= 500 }.map { it.email }.size)
+//}
 
 
 
