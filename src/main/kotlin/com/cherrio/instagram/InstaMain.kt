@@ -96,7 +96,8 @@ suspend fun getUserDetails(userId: String):User {
     delay(runEveryRandomSeconds())
     val cookie = cooky!!.cookies.joinToString("; ") { "${it.name}=${it.value}" }
 
-    val response = client.get("https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId") {
+    //https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId
+    val response = client.get("https://i.instagram.com/api/v1/users/$userId/info/") {
         header("x-ig-app-id", "936619743392459")
         header(
             "cookie", cookie
