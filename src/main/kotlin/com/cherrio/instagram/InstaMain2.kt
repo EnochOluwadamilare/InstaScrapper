@@ -18,6 +18,7 @@ import kotlin.io.path.writeText
 import kotlin.math.log
 
 var index = 0
+
 fun login(userId: String = ""): String {
     val creds = listOf(
         Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -63,6 +64,7 @@ fun login(userId: String = ""): String {
             println("Done")
         }
     }catch (e: TimeoutError){
+        println(e.localizedMessage)
         login(userId)
     }
     incrementIndex(credentials.size)
