@@ -74,7 +74,10 @@ suspend fun restart(){
 suspend fun refreshCookie(){
     val railway = System.getenv("RAILWAY")
     cooky = if (railway != null){
-        client.get("http://instascrapper-env.eba-yjypcynj.us-east-1.elasticbeanstalk.com/login").body()
+        val loginResponse = client.get("http://instascrapper-env.eba-yjypcynj.us-east-1.elasticbeanstalk.com/login").bodyAsText()
+        println("Login Response")
+        println(loginResponse)
+        loginResponse.toCookies()
     }else{
         login().toCookies()
     }
@@ -82,7 +85,6 @@ suspend fun refreshCookie(){
 
 suspend fun List<UserAndId>.get() = coroutineScope {
     val users = map { async { getUserDetails(it.id) } }.awaitAll()
-    incrementIndex()
     return@coroutineScope users
 }
 

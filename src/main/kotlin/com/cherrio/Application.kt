@@ -21,10 +21,13 @@ fun Application.module() {
     configureRouting()
     configureLogging()
     scrapperRouting()
-    launch {
-        while (true){
-            refreshGoogleToken()
-            delay(Duration.ofMinutes(45))
+    val railway = System.getenv("RAILWAY")
+    if (railway != null) {
+        launch {
+            while (true) {
+                refreshGoogleToken()
+                delay(Duration.ofMinutes(45))
+            }
         }
     }
 
