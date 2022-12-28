@@ -21,6 +21,7 @@ import kotlin.math.log
 var index = 0
 
 fun login(userId: String = ""): String {
+    var html = ""
     val creds = listOf(
         Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
         Triple("cherrio.llc@gmail.com","Ayodele4_","56978350990"),
@@ -46,6 +47,7 @@ fun login(userId: String = ""): String {
             println(page.title())
 
             println("Logging in")
+            html = page.content()
             page.locator("[name='username']").fill(email)
             page.locator("[name='password']").fill(password)
             page.locator("[type='submit']").click()
@@ -67,6 +69,7 @@ fun login(userId: String = ""): String {
     }catch (e: TimeoutError){
         incrementIndex(credentials.size)
         println(e.localizedMessage)
+        Paths.get("index.html").writeText(html)
         Paths.get("state.json").deleteIfExists()
     }
     incrementIndex(credentials.size)

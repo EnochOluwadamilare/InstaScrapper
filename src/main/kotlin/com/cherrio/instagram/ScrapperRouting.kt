@@ -6,6 +6,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
+import java.nio.file.Paths
+import kotlin.io.path.Path
 
 fun Application.scrapperRouting(){
     routing {
@@ -41,6 +43,9 @@ fun Route.restarting(){
     get("/begin"){
         index = 0
         call.respond(HttpStatusCode.OK, "Begin")
+    }
+    get("/status"){
+        call.respondFile(Paths.get("index.html").toFile())
     }
 }
 
