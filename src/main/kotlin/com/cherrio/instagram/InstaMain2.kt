@@ -20,6 +20,9 @@ import kotlin.math.log
 
 var index = 0
 
+//fun main(){
+//    login()
+//}
 fun login(userId: String = ""): String {
     var html = ""
     val creds = listOf(
@@ -40,7 +43,7 @@ fun login(userId: String = ""): String {
     println("Using: $email")
     try {
         Playwright.create().use { playwright ->
-            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
+            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
             val context = browser.newContext()
             val page: Page = context.newPage()
             page.navigate("https://www.instagram.com/")

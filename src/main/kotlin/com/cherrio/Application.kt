@@ -13,7 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.time.delay
 import kotlinx.serialization.json.Json
+import java.nio.file.Paths
 import java.time.Duration
+import kotlin.io.path.exists
 import kotlin.time.Duration.Companion.minutes
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
@@ -33,6 +35,7 @@ fun Application.module() {
             }
         }
     }
+    println("State exists: ${Paths.get("state.json").exists()}")
 }
 
 fun Application.configureSerialization() {

@@ -59,11 +59,12 @@ suspend fun restart(){
     while (true) {
         val usersAndId = getOtherPages()
         val users = usersAndId.get()
-        users.forEach {
-                table.create(it.map())
+        usersAndId.forEach {
+            val user = getUserDetails(it.id)
+            table.create(user.map())
         }
         println("Done with page $page")
-        delay(1.minutes)
+        //delay(1.minutes)
     }
 }
 
@@ -100,7 +101,7 @@ suspend fun List<UserAndId>.get() = coroutineScope {
 }
 
 suspend fun getUserDetails(userId: String):User {
-    delay(runEveryRandomSeconds())
+    delay(1.minutes)
     val cookie = cooky!!.cookies.joinToString("; ") { "${it.name}=${it.value}" }
 
     //https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId
@@ -117,15 +118,15 @@ suspend fun getUserDetails(userId: String):User {
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        checkPointOrRefresh(error)
-        getUserDetails(userId)
+        throw Exception(error)
     }else {
         try {
             val userResponse = response.body<UserResponse>()
             userResponse.user
         }catch (e: Exception){
-            checkPointOrRefresh(response.bodyAsText())
-            getUserDetails(userId)
+            throw Exception(e.localizedMessage)
+//            checkPointOrRefresh(response.bodyAsText())
+//            getUserDetails(userId)
         }
 
     }
