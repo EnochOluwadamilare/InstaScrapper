@@ -27,16 +27,18 @@ fun Route.restarting(){
         restart()
 
     }
-    get("/refresh"){
-        val username = call.parameters["user_id"] ?: ""
-        val oldState = call.parameters["state"]
-        if (oldState != null){
-            refreshCookie(userId = username, true)
-            call.respond(HttpStatusCode.OK, Paths.get("state.json").readText())
-        }else {
-            refreshCookie(userId = username)
-            call.respond(HttpStatusCode.OK,"Refreshed")
-        }
+    post("/refresh"){
+//        val username = call.parameters["user_id"] ?: ""
+//        val oldState = call.parameters["state"]
+//        if (oldState != null){
+//            refreshCookie(userId = username, true)
+//            call.respond(HttpStatusCode.OK, Paths.get("state.json").readText())
+//        }else {
+//            refreshCookie(userId = username)
+//            call.respond(HttpStatusCode.OK,"Refreshed")
+//        }
+        cooky = call.receive<String>().toCookies()
+        call.respond(HttpStatusCode.OK,"Refreshed")
     }
     get("/set-details"){
        val creds = call.receive<Creds>()
