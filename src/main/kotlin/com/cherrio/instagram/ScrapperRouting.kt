@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import java.nio.file.Paths
 import kotlin.io.path.Path
+import kotlin.io.path.readText
 
 fun Application.scrapperRouting(){
     routing {
@@ -38,7 +39,12 @@ fun Route.restarting(){
     }
     get("/login"){
         val username = call.parameters["user_id"] ?: ""
-        call.respond(HttpStatusCode.OK, login(username))
+        val oldState = call.parameters["state"]
+        if (oldState != null){
+            call.respond(HttpStatusCode.OK, Paths.get("state.json").readText())
+        }else {
+            call.respond(HttpStatusCode.OK, login(username))
+        }
     }
     get("/begin"){
         index = 0

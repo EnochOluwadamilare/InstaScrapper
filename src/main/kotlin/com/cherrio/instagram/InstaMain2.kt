@@ -20,6 +20,7 @@ import kotlin.math.log
 
 var index = 0
 
+
 fun login(userId: String = ""): String {
     var html = ""
     val creds = listOf(
@@ -43,6 +44,10 @@ fun login(userId: String = ""): String {
             val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
             val context = browser.newContext()
             val page: Page = context.newPage()
+            page.onResponse {
+                println(it.status())
+                println(it.text())
+            }
             page.navigate("https://www.instagram.com/")
             println(page.title())
 
