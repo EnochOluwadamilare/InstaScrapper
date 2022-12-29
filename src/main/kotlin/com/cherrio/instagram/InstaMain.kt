@@ -58,7 +58,7 @@ suspend fun shuffleUserAgent(){
 suspend fun restart(){
     while (true) {
         val usersAndId = getOtherPages()
-        val users = usersAndId.get()
+        //val users = usersAndId.get()
         usersAndId.forEach {
             val user = getUserDetails(it.id)
             table.create(user.map())
