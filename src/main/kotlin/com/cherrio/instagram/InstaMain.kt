@@ -67,17 +67,24 @@ suspend fun restart(){
     }
 }
 
-suspend fun refreshCookie(userId: String = ""){
+suspend fun refreshCookie(userId: String = "", state: Boolean = false){
     println("Refreshing...")
     //{"message":"checkpoint_required","checkpoint_url":"https://www.instagram.com/challenge/?next=/api/v1/tags/asoebi/sections/","lock":true,"flow_render_type":0,"status":"fail";}
     val railway = System.getenv("RAILWAY")
     cooky = if (railway != null){
         val loginResponse = client.get("http://instascrapper-env.eba-yjypcynj.us-east-1.elasticbeanstalk.com/login"){
-            if (userId.isNotEmpty()) {
+            url{
+                if (userId.isNotEmpty()) {
+                    parameters.append("state", state.toString())
+                }
+                if (userId.isNotEmpty()) {
                 url {
                     parameters.append("user_id", userId)
                 }
             }
+            }
+
+
         }.bodyAsText()
         println("Login Response")
         println(loginResponse)
