@@ -20,9 +20,9 @@ import kotlin.math.log
 
 var index = 0
 
-//fun main(){
-//    login()
-//}
+fun main(){
+    login()
+}
 fun login(userId: String = ""): String {
     var html = ""
     val creds = listOf(
@@ -167,3 +167,33 @@ suspend fun nextUser(isFirst: Boolean = false, page: Page){
 private data class SlackRequest(
     val text: String
 )
+
+
+
+fun Column(block: ColumnScope.() -> Unit): ColumnScope{
+    return ColumnScope().apply(block)
+}
+
+class ColumnScope{
+    val views = mutableListOf<String>()
+    init {
+        println("Column in")
+    }
+    fun add(view: String){
+        views.add(view)
+    }
+}
+fun ColumnScope.text(text: String){
+    add(text)
+}
+
+//fun main(){
+//  val cc =  Column {
+//        text("Text1")
+//        text("Text2")
+//        text("Text3")
+//        text("Text4")
+//        text("Text5")
+//    }
+//    println(cc.views)
+//}

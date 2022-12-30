@@ -1,5 +1,6 @@
 package com.cherrio.instagram
 
+import com.cherrio.dowork
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -37,8 +38,8 @@ fun Route.restarting(){
 //            refreshCookie(userId = username)
 //            call.respond(HttpStatusCode.OK,"Refreshed")
 //        }
-        cooky = call.receive<String>().toCookies()
         call.respond(HttpStatusCode.OK,"Refreshed")
+        dowork()
     }
     get("/set-details"){
        val creds = call.receive<Creds>()

@@ -26,16 +26,16 @@ fun Application.module() {
     configureRouting()
     configureLogging()
     scrapperRouting()
-    val railway = System.getenv("RAILWAY")
-    if (railway != null) {
-        launch {
-            while (true) {
-                refreshGoogleToken()
-                delay(Duration.ofMinutes(45))
-            }
-        }
-    }
-    println("State exists: ${Paths.get("state.json").exists()}")
+//    val railway = System.getenv("RAILWAY")
+//    if (railway != null) {
+//        launch {
+//            while (true) {
+//                refreshGoogleToken()
+//                delay(Duration.ofMinutes(45))
+//            }
+//        }
+//    }
+//    println("State exists: ${Paths.get("state.json").exists()}")
 }
 
 fun Application.configureSerialization() {
