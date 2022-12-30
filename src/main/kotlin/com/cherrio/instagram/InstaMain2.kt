@@ -20,9 +20,6 @@ import kotlin.math.log
 
 var index = 0
 
-fun main(){
-    login()
-}
 fun login(userId: String = ""): String {
     var html = ""
     val creds = listOf(
