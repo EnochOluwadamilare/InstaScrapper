@@ -35,20 +35,18 @@ suspend fun dowork(){
 
     coroutineScope {
         val requests = (1..1_000_000).map { async { login(it) } }.awaitAll()
-        println(requests)
     }
 
 
 }
 
 
-suspend fun login(requestId: Int): String{
+suspend fun login(requestId: Int){
     println(requestId)
     val response = client.post("https://api.axocheck.com/api/v1/user/login"){
         setBody(Login("takenya_mccray0pmv@associated.eh", "calv435@"))
         contentType(ContentType.Application.Json)
     }
-    return response.bodyAsText()
 }
 
 @Serializable
