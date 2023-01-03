@@ -23,54 +23,29 @@ import kotlin.time.Duration.Companion.minutes
 
 var maxId = ""
 var page = 0
-val tag = "asoebi"
+var tag = "asoebi"
 
 val sheetDb = SheetsDb {
-    bearerToken =
-        "ya29.a0AeTM1idDgIb_hy9Fv_tJ16dlS2pUAjCwiugdWPblYOhlAEvm3yNRYvh4wuCpzLx_CaCyaqeqCUnrw_Ec8C2uE2r6VTygWzwB8tYm3c4jBVcyLXKG8PIRvTxFexqHgBXCVu2hHmiZQLv1Ka_BpiznlQxaA5mz-x0nTgaCgYKAeISAQASFQHWtWOmyqT0Rt1DeXUGJzm1EoNiXw0169"
     sheetId = "1YmBiVCmYn2fn15wmmy_Ex6aOGNyC5wv991vTAZkZby8"
 }
-var table = sheetDb.getTable<Asoebi>()
+val table = sheetDb.getTable<Customers>()
 
-var credentials = listOf<Credentials>()
-
-val userAndIds = mutableListOf<UserAndId>()
-var times = 0
-val userAgents = setOf(
-    "Mozilla/5.0 (Linux; Android 12; SM-S906N Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/80.0.3987.119 Mobile Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 10; SM-G996U Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Mobile Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 12; Pixel 6 Build/SD1A.210817.023; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/94.0.4606.71 Mobile Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 10; Google Pixel 4 Build/QD1A.190821.014.C2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.108 Mobile Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2 Build/OPD1.170811.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/59.0.3071.125 Mobile Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 6P Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.83 Mobile Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 10; HTC Desire 21 pro 5G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.127 Mobile Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 6.0; HTC One X10 Build/MRA58K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/61.0.3163.98 Mobile Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-)
-var userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
 var cooky: Cookies? = null
-
-suspend fun shuffleUserAgent(){
-    userAgent = userAgents.shuffled().first()
-    delay(5.minutes)
-}
 
 suspend fun restart(){
     while (true) {
         val usersAndId = getOtherPages()
-        //val users = usersAndId.get()
-        usersAndId.forEach {
-            val user = getUserDetails(it.id)
-            table.create(user.map())
+        val users = usersAndId.get()
+        users.forEach {
+            table.create(it.map(), tag)
         }
         println("Done with page $page")
-        //delay(1.minutes)
+        delay(1.minutes)
     }
 }
 
 suspend fun refreshCookie(userId: String = "", state: Boolean = false){
     println("Refreshing...")
-    //{"message":"checkpoint_required","checkpoint_url":"https://www.instagram.com/challenge/?next=/api/v1/tags/asoebi/sections/","lock":true,"flow_render_type":0,"status":"fail";}
     val railway = System.getenv("RAILWAY")
     cooky = if (railway != null){
         val loginResponse = client.get("http://instascrapper-env.eba-yjypcynj.us-east-1.elasticbeanstalk.com/login"){
@@ -84,10 +59,7 @@ suspend fun refreshCookie(userId: String = "", state: Boolean = false){
                 }
             }
             }
-
-
         }.bodyAsText()
-        println("Login Response")
         println(loginResponse)
         loginResponse.toCookies()
     }else{
@@ -222,13 +194,9 @@ suspend fun checkPointOrRefresh(error: String){
     }
 }
 
-fun List<Credentials>.dropAt(pos: Int){
-    //println("Dropping ${get(index).name}'s account")
-    credentials = filterIndexed { index, _ -> pos != index }
-}
 
 fun User.map() =
-    Asoebi(
+    Customers(
         username = username,
         profileUrl = "https://www.instagram.com/$username",
         fullName = fullName,
@@ -262,7 +230,7 @@ data class Credentials(
 )
 
 @Serializable
-data class Asoebi(
+data class Customers(
     @SerialName("username")
     val username: String,
     @SerialName("profile_url")

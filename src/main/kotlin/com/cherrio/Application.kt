@@ -4,6 +4,7 @@ import com.cherrio.instagram.login
 import com.cherrio.instagram.scrapperRouting
 import io.ktor.server.application.*
 import com.cherrio.plugins.*
+import com.cherrio.servers.railwayServerRouting
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -26,16 +27,17 @@ fun Application.module() {
     configureRouting()
     configureLogging()
     scrapperRouting()
+    railwayServerRouting()
 //    val railway = System.getenv("RAILWAY")
 //    if (railway != null) {
-//        launch {
-//            while (true) {
-//                refreshGoogleToken()
-//                delay(Duration.ofMinutes(45))
-//            }
-//        }
+//
 //    }
-//    println("State exists: ${Paths.get("state.json").exists()}")
+    launch {
+        while (true) {
+            refreshGoogleToken()
+            delay(Duration.ofMinutes(45))
+        }
+    }
 }
 
 fun Application.configureSerialization() {

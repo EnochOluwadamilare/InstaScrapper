@@ -11,26 +11,23 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import java.lang.Exception
 import java.nio.file.Paths
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import kotlin.math.log
 
 var index = 0
 
+val creds = listOf(
+    Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
+    Triple("cherrio.llc@gmail.com","Ayodele4_","56978350990"),
+    Triple("elizabethy.keen@gmail.com","Elizabeth12_","57221602232"),
+    Triple("donaldy.ressler@gmail.com","Donald12_","57201108496"),
+    Triple("ray.redd.reddington@gmail.com","Raymond12_","57232760704"),
+    Triple("oaks224@gmail.com","Ayodele4_","56822524662")
+)
 fun login(userId: String = ""): String {
     var html = ""
-    val creds = listOf(
-        Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
-        Triple("cherrio.llc@gmail.com","Ayodele4_","56978350990"),
-        Triple("elizabethy.keen@gmail.com","Elizabeth12_","57221602232"),
-        Triple("donaldy.ressler@gmail.com","Donald12_","57201108496"),
-        Triple("ray.redd.reddington@gmail.com","Raymond12_","57232760704"),
-        Triple("oaks224@gmail.com","Ayodele4_","56822524662")
-    )
-
     val credentials = if (userId.isNotEmpty()){
         sendNotification(creds.find { it.third == userId }!!.first)
         creds.filter { it.third != userId }
@@ -70,7 +67,6 @@ fun login(userId: String = ""): String {
         incrementIndex(credentials.size)
         println(e.localizedMessage)
         Paths.get("index.html").writeText(html)
-        Paths.get("state.json").deleteIfExists()
     }
     incrementIndex(credentials.size)
     return Paths.get("state.json").readText()
@@ -97,8 +93,7 @@ fun sendNotification(email: String) = runBlocking{
     println("Notification: $requestBody with status: ${request.status == HttpStatusCode.OK}")
 }
 
-var continueWith = false
-suspend fun begin(tag: String, username: String) {
+suspend fun begin(tag: String) {
     Playwright.create().use { playwright ->
         val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
         val context = browser.newContext(Browser.NewContextOptions().setStorageStatePath(Paths.get("state.json")))
@@ -106,12 +101,9 @@ suspend fun begin(tag: String, username: String) {
         page.onResponse {
             if (it.url().contains("api/v1/users")){
                 val user = json.decodeFromString<UserResponse>(it.text()).user
-//                if (user.username == username || continueWith) {
-//                    continueWith = true
-//                    runBlocking {
-//                        table.create(user.map())
-//                    }
-//                }
+                runBlocking {
+                    table.create(user.map(), tag)
+                }
             }
         }
         println("Before navigate")
@@ -121,13 +113,6 @@ suspend fun begin(tag: String, username: String) {
         val pas = page.locator("[class='_aagu']").first().click()
 
         nextUser(isFirst = true, page = page)
-
-
-
-//        println(page.title())
-//         while (!page.locator("span",Page.LocatorOptions().setHasText("End")).isVisible){
-//             page.mouse().wheel(0.0, 100.0)
-//         }
 
     }
 }
@@ -164,33 +149,3 @@ suspend fun nextUser(isFirst: Boolean = false, page: Page){
 private data class SlackRequest(
     val text: String
 )
-
-
-
-fun Column(block: ColumnScope.() -> Unit): ColumnScope{
-    return ColumnScope().apply(block)
-}
-
-class ColumnScope{
-    val views = mutableListOf<String>()
-    init {
-        println("Column in")
-    }
-    fun add(view: String){
-        views.add(view)
-    }
-}
-fun ColumnScope.text(text: String){
-    add(text)
-}
-
-//fun main(){
-//  val cc =  Column {
-//        text("Text1")
-//        text("Text2")
-//        text("Text3")
-//        text("Text4")
-//        text("Text5")
-//    }
-//    println(cc.views)
-//}

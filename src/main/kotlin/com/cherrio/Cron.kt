@@ -16,8 +16,7 @@ import kotlinx.serialization.Serializable
 
 suspend fun refreshGoogleToken(){
     val token = getRefreshToken()
-    sheetDb.token = token
-    table = sheetDb.getTable()
+    sheetDb.setBearerToken(token)
 }
 
 

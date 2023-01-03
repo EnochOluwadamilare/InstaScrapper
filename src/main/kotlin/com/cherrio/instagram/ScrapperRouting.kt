@@ -1,6 +1,5 @@
 package com.cherrio.instagram
 
-import com.cherrio.dowork
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -18,17 +17,17 @@ fun Application.scrapperRouting(){
 }
 
 fun Route.restarting(){
-    get("/restart"){
-        val params = call.parameters
-        val _maxId = params["max_id"] ?: maxId
-        val _page = params["page"] ?: page.toString()
-        maxId = _maxId
-        page = _page.toInt()
-        call.respond(HttpStatusCode.OK, "Scrapping restarted")
-        restart()
-
-    }
-    post("/refresh"){
+//    get("/restart"){
+//        val params = call.parameters
+//        val _maxId = params["max_id"] ?: maxId
+//        val _page = params["page"] ?: page.toString()
+//        maxId = _maxId
+//        page = _page.toInt()
+//        call.respond(HttpStatusCode.OK, "Scrapping restarted")
+//        restart()
+//
+//    }
+//    post("/refresh"){
 //        val username = call.parameters["user_id"] ?: ""
 //        val oldState = call.parameters["state"]
 //        if (oldState != null){
@@ -38,30 +37,28 @@ fun Route.restarting(){
 //            refreshCookie(userId = username)
 //            call.respond(HttpStatusCode.OK,"Refreshed")
 //        }
-        call.respond(HttpStatusCode.OK,"Refreshed")
-        dowork()
-    }
-    get("/set-details"){
-       val creds = call.receive<Creds>()
-        credentials = creds.credentials
-        call.respond(HttpStatusCode.OK, "Details set")
-    }
-    get("/login"){
-        val username = call.parameters["user_id"] ?: ""
-        val oldState = call.parameters["state"]
-        if (oldState != null){
-            call.respond(HttpStatusCode.OK, Paths.get("state.json").readText())
-        }else {
-            call.respond(HttpStatusCode.OK, login(username))
-        }
-    }
-    get("/begin"){
-        index = 0
-        call.respond(HttpStatusCode.OK, "Begin")
-    }
-    get("/status"){
-        call.respondFile(Paths.get("index.html").toFile())
-    }
+//    }
+//    get("/set-details"){
+//       val creds = call.receive<Creds>()
+//        credentials = creds.credentials
+//        call.respond(HttpStatusCode.OK, "Details set")
+//    }
+//    get("/login"){
+//        val username = call.parameters["user_id"] ?: ""
+//        val oldState = call.parameters["state"]
+//        if (oldState != null){
+//            call.respond(HttpStatusCode.OK, Paths.get("state.json").readText())
+//        }else {
+//            call.respond(HttpStatusCode.OK, login(username))
+//        }
+//    }
+//    get("/begin"){
+//        index = 0
+//        call.respond(HttpStatusCode.OK, "Begin")
+//    }
+//    get("/status"){
+//        call.respondFile(Paths.get("index.html").toFile())
+//    }
 }
 
 @Serializable

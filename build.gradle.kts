@@ -21,7 +21,11 @@ application {
 
 repositories {
     mavenLocal()
+    maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
+    }
     mavenCentral()
+
 }
 
 jib {
@@ -53,7 +57,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-server-call-logging-jvm:2.1.2")
-    implementation("io.github.cherrio-llc:sheets-db:0.0.2")
+    implementation("io.github.cherrio-llc:sheets-db:0.0.1-SNAPSHOT")
     implementation(libs.jsoup)
 
     implementation("com.microsoft.playwright:playwright:1.27.0")
