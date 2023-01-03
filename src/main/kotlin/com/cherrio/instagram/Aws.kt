@@ -95,7 +95,7 @@ fun sendNotification(email: String) = runBlocking{
 
 suspend fun begin(tag: String) {
     Playwright.create().use { playwright ->
-        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
+        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
         val context = browser.newContext(Browser.NewContextOptions().setStorageStatePath(Paths.get("state.json")))
         val page: Page = context.newPage()
         page.onResponse {
@@ -107,7 +107,7 @@ suspend fun begin(tag: String) {
             }
         }
         println("Before navigate")
-        page.navigate("https://www.instagram.com/explore/tags/$tag/")
+        page.navigate("https://www.instagram.com/explore/tags/${tag.lowercase()}/")
 
         //First post
         val pas = page.locator("[class='_aagu']").first().click()
