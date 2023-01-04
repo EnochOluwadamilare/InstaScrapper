@@ -27,6 +27,7 @@ val creds = listOf(
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
 )
 
+
 fun login(userId: String = ""): String {
     var html = ""
     val credentials = if (userId.isNotEmpty()){
@@ -38,7 +39,7 @@ fun login(userId: String = ""): String {
     println("Using: $email")
     try {
         Playwright.create().use { playwright ->
-            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
+            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
             val context = browser.newContext()
             val page: Page = context.newPage()
             page.navigate("https://www.instagram.com/")
