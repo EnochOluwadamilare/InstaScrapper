@@ -29,10 +29,11 @@ val sheetDb = SheetsDb {
     sheetId = "1YmBiVCmYn2fn15wmmy_Ex6aOGNyC5wv991vTAZkZby8"
 }
 val table = sheetDb.getTable<Customers>()
-
 var cooky: Cookies? = null
 
-suspend fun restart(){
+suspend fun restart(tag: String?, _maxId: String, _page: Int){
+    page = _page
+    maxId = _maxId
     while (true) {
         val usersAndId = getOtherPages()
         val users = usersAndId.get()
@@ -68,12 +69,10 @@ suspend fun refreshCookie(userId: String = "", state: Boolean = false){
 }
 
 suspend fun List<UserAndId>.get() = coroutineScope {
-    val users = map { async { getUserDetails(it.id) } }.awaitAll()
-    return@coroutineScope users
+    return@coroutineScope map { async { getUserDetails(it.id) } }.awaitAll()
 }
 
 suspend fun getUserDetails(userId: String):User {
-    delay(1.minutes)
     val cookie = cooky!!.cookies.joinToString("; ") { "${it.name}=${it.value}" }
 
     //https://nt5j3qu02h.execute-api.us-east-1.amazonaws.com/scrapper/user-details/$userId
@@ -83,22 +82,18 @@ suspend fun getUserDetails(userId: String):User {
             "cookie", cookie
         )
         header("x-csrftoken", cooky!!.cookies.find { it.name == "csrftoken" }!!.value)
-//        header("x-requested-with","XMLHttpRequest")
-//        header("sec-ch-ua-platform", "macOS")
-//        header("sec-ch-ua", """Not?A_Brand";v="8", "Chromium";v="108", "Brave";v="108""")
-        //userAgent(userAgents.shuffled().first())
     }
     return if (!response.status.isSuccess()){
         val error = response.bodyAsText()
-        throw Exception(error)
+        checkPointOrRefresh(error)
+        getUserDetails(userId)
     }else {
         try {
             val userResponse = response.body<UserResponse>()
             userResponse.user
         }catch (e: Exception){
-            throw Exception(e.localizedMessage)
-//            checkPointOrRefresh(response.bodyAsText())
-//            getUserDetails(userId)
+            checkPointOrRefresh(response.bodyAsText())
+            getUserDetails(userId)
         }
 
     }
@@ -189,7 +184,8 @@ suspend fun checkPointOrRefresh(error: String){
             refreshCookie()
         }
         else -> {
-            refreshCookie()
+            sendNotification(error)
+            throw Exception(error)
         }
     }
 }

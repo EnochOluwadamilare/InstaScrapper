@@ -1,7 +1,6 @@
 package com.cherrio
 
-import com.cherrio.instagram.login
-import com.cherrio.instagram.scrapperRouting
+import com.cherrio.instagram.*
 import io.ktor.server.application.*
 import com.cherrio.plugins.*
 import com.cherrio.servers.railwayServerRouting
@@ -17,6 +16,7 @@ import kotlinx.serialization.json.Json
 import java.nio.file.Paths
 import java.time.Duration
 import kotlin.io.path.exists
+import kotlin.io.path.readText
 import kotlin.time.Duration.Companion.minutes
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
@@ -28,15 +28,18 @@ fun Application.module() {
     configureLogging()
     scrapperRouting()
     railwayServerRouting()
-//    val railway = System.getenv("RAILWAY")
-//    if (railway != null) {
-//
-//    }
-    launch {
-        while (true) {
-            refreshGoogleToken()
-            delay(Duration.ofMinutes(45))
+    val railway = System.getenv("RAILWAY")
+    if (railway != null) {
+        launch {
+            while (true) {
+                refreshGoogleToken()
+                delay(Duration.ofMinutes(45))
+            }
         }
+    }
+    launch {
+        cooky = Paths.get("state.json").readText().toCookies()
+        restart("naijabusinessowners", "",2)
     }
 }
 

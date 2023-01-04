@@ -26,6 +26,7 @@ val creds = listOf(
     Triple("ray.redd.reddington@gmail.com","Raymond12_","57232760704"),
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
 )
+
 fun login(userId: String = ""): String {
     var html = ""
     val credentials = if (userId.isNotEmpty()){
@@ -37,7 +38,7 @@ fun login(userId: String = ""): String {
     println("Using: $email")
     try {
         Playwright.create().use { playwright ->
-            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
+            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
             val context = browser.newContext()
             val page: Page = context.newPage()
             page.navigate("https://www.instagram.com/")
@@ -84,7 +85,7 @@ fun sendNotification(email: String) = runBlocking{
     val url = "https://hooks.slack.com/services/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"
     val requestBody = """
         Lead-NOTIFICATION
-        Email: $email
+        $email
     """
     val request = client.post(url){
         contentType(ContentType.Application.Json)
@@ -95,7 +96,7 @@ fun sendNotification(email: String) = runBlocking{
 
 suspend fun begin(tag: String) {
     Playwright.create().use { playwright ->
-        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
+        val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
         val context = browser.newContext(Browser.NewContextOptions().setStorageStatePath(Paths.get("state.json")))
         val page: Page = context.newPage()
         page.onResponse {
@@ -132,7 +133,7 @@ suspend fun nextUser(isFirst: Boolean = false, page: Page){
         nextDone = true
     }
     //Get user details
-    page.locator("[class='xt0psk2']").first().hover()
+    page.locator("[class='x78zum5']").first().hover()
 
     page.waitForResponse(
         { response: Response ->
@@ -140,7 +141,7 @@ suspend fun nextUser(isFirst: Boolean = false, page: Page){
         }
     ) {}
 
-    delay(3000)
+    delay(1000)
     nextUser(page = page)
 
 }
