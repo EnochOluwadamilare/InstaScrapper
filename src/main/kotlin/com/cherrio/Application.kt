@@ -38,7 +38,7 @@ fun Application.module() {
         }
         launch {
             cooky = Paths.get("state.json").readText().toCookies()
-            restart("naijabusinessowners", "",10)
+            restart("naijabusinessowners", "",18)
         }
     }
 

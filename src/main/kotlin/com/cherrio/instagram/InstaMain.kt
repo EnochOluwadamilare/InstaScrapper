@@ -41,7 +41,7 @@ suspend fun restart(tag: String?, _maxId: String, _page: Int){
             table.create(it.map(), tag)
         }
         println("Done with page $page")
-        delay(1.minutes)
+        delay(15.minutes)
     }
 }
 
@@ -185,7 +185,7 @@ suspend fun checkPointOrRefresh(error: String){
             refreshCookie()
         }
         else -> {
-            sendNotification(error)
+            delay(30.minutes)
             refreshCookie()
         }
     }
