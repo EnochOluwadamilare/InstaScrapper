@@ -185,7 +185,7 @@ suspend fun checkPointOrRefresh(error: String){
             refreshCookie()
         }
         else -> {
-            delay(30.minutes)
+            delay(1.minutes)
             refreshCookie()
         }
     }
