@@ -210,7 +210,7 @@ fun User.map() =
         isBusiness = if (isBusiness) "Business" else "Personal",
         pageName = pageName?: "None",
         whatsappNumber = whatsappNumber?: "None",
-        url = externalUrl,
+        url = externalUrl.ifNull { "None" },
         address = addressStreet.ifNull { "None" },
         city = cityName.ifNull { "None" }
     )

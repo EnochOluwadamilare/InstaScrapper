@@ -1,10 +1,7 @@
 package com.cherrio
 
-import com.cherrio.plugins.client
 import com.cherrio.sheetsdb.client.json
 import com.cherrio.sheetsdb.database.*
-import com.cherrio.sheetsdb.init.SheetsDb
-import com.cherrio.sheetsdb.init.getTable
 import com.microsoft.playwright.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -14,10 +11,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
-
-
 
 
 @Serializable
@@ -29,11 +22,8 @@ data class Login(
 )
 
 
-
-
-
 fun String?.ifNull(block: () -> String): String {
-    return this ?: block()
+    return if (isNullOrEmpty()) block() else this
 }
 
 fun String.startsWithDigit(): Boolean {
