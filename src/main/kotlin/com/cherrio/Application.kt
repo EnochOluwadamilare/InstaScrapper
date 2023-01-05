@@ -36,10 +36,6 @@ fun Application.module() {
                 delay(Duration.ofMinutes(45))
             }
         }
-        launch {
-            cooky = Paths.get("state.json").readText().toCookies()
-            restart("naijabusinessowners", "",18)
-        }
     }
 
 }

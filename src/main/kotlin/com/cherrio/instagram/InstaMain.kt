@@ -184,6 +184,9 @@ suspend fun checkPointOrRefresh(error: String){
             delay(10.minutes)
             refreshCookie()
         }
+        error.contains("logrequire_login") ->{
+            refreshCookie()
+        }
         else -> {
             delay(1.minutes)
             refreshCookie()
