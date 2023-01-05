@@ -36,6 +36,8 @@ fun Application.module() {
                 delay(Duration.ofMinutes(45))
             }
         }
+        println("Getting cookie")
+        cooky = Paths.get("state.json").readText().toCookies()
     }
 
 }
