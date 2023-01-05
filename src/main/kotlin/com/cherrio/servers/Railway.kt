@@ -4,6 +4,7 @@ import com.cherrio.instagram.*
 import com.cherrio.sheetsdb.init.SheetsDb
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.nio.file.Paths
@@ -24,6 +25,11 @@ fun Route.railway(){
         val tag = params["tag"]
         call.respond(HttpStatusCode.OK,"Ok")
         restart(tag,maxId,page.toInt())
+    }
+    post("/credentials"){
+        val body = call.receive<String>()
+        cooky = body.toCookies()
+        call.respond(HttpStatusCode.OK)
     }
 }
 
