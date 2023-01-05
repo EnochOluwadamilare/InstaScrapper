@@ -45,10 +45,10 @@ suspend fun restart(tag: String?, _maxId: String, _page: Int){
     }
 }
 
-suspend fun refreshCookie(userId: String = "", state: Boolean = false){
+suspend fun refreshCookie(userId: String = "", state: Boolean = false): Cookies?{
     println("Refreshing...")
     val railway = System.getenv("RAILWAY")
-    cooky = if (railway != null){
+    return if (railway != null){
         val loginResponse = client.get("http://instascrapper-env.eba-yjypcynj.us-east-1.elasticbeanstalk.com/login"){
             url{
                 if (userId.isNotEmpty()) {
@@ -60,9 +60,14 @@ suspend fun refreshCookie(userId: String = "", state: Boolean = false){
                 }
             }
             }
-        }.bodyAsText()
-        println(loginResponse)
-        loginResponse.toCookies()
+        }
+        if (loginResponse.status.isSuccess()){
+            println(loginResponse)
+            loginResponse.bodyAsText().toCookies()
+        }else{
+            null
+        }
+
     }else{
         login().toCookies()
     }
@@ -178,18 +183,17 @@ suspend fun checkPointOrRefresh(error: String){
     println("checkPointOrRefresh: $error")
     when{
         error.contains("checkpoint_required") ->{
-            refreshCookie(userId = cooky!!.cookies.find { it.name == "ds_user_id"}!!.value)
+            cooky = refreshCookie(userId = cooky!!.cookies.find { it.name == "ds_user_id"}!!.value)
         }
         error.contains("spam") -> {
             delay(10.minutes)
-            refreshCookie()
+            cooky = refreshCookie()
         }
-        error.contains("logrequire_login") ->{
+        error.contains("require_login") ->{
             refreshCookie()
         }
         else -> {
-            delay(1.minutes)
-            refreshCookie()
+            cooky = refreshCookie()
         }
     }
 }

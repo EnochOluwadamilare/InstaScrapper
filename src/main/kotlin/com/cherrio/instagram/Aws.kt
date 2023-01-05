@@ -27,9 +27,9 @@ val creds = listOf(
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
 )
 
-
 fun login(userId: String = ""): String {
     var html = ""
+    var success = false
     val credentials = if (userId.isNotEmpty()){
         sendNotification(creds.find { it.third == userId }!!.first)
         creds.filter { it.third != userId }
@@ -57,13 +57,19 @@ fun login(userId: String = ""): String {
 //            it.getByText("Not Now").first().click()
 //        }
 
-            page.getByText("Search").first().click()
-            page.locator("[placeholder='Search']").fill("#lagosvendors")
+//            page.getByText("Search").first().click()
+//            page.locator("[placeholder='Search']").fill("#lagosvendors")
+
+            page.waitForResponse(
+                { response: Response ->
+                    response.url().contains("api/v1/feed/timeline") && response.status() == 200
+                }
+            ) {}
 
             context.storageState(BrowserContext.StorageStateOptions().setPath(Paths.get("state.json")))
 
             println("Done")
-
+            success = true
         }
     }catch (e: TimeoutError){
         incrementIndex(credentials.size)
@@ -71,7 +77,7 @@ fun login(userId: String = ""): String {
         Paths.get("index.html").writeText(html)
     }
     incrementIndex(credentials.size)
-    return Paths.get("state.json").readText()
+    return if (success) Paths.get("state.json").readText() else ""
 }
 
 fun incrementIndex(size: Int){

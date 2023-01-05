@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.nio.file.Paths
 
 
 fun Application.railwayServerRouting(){
@@ -28,6 +29,14 @@ fun Route.railway(){
 
 fun Route.aws(){
     get("/login"){
-        call.respond(HttpStatusCode.OK, login())
+        val response = login()
+        if (response.isEmpty()){
+            call.respond(HttpStatusCode.BadRequest, "An error occurred")
+        }else {
+            call.respond(HttpStatusCode.OK, response)
+        }
+    }
+    get("/status"){
+        call.respondFile(Paths.get("index.html").toFile())
     }
 }
