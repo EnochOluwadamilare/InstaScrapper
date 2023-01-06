@@ -14,6 +14,7 @@ import kotlinx.serialization.decodeFromString
 import java.nio.file.Paths
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import kotlin.math.log
 import kotlin.random.Random
 
 var index = 0
@@ -27,8 +28,7 @@ val creds = listOf(
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
 )
 
-var userAgents =  Paths.get("src/main/resources/user-agents.txt").readText().split("\n")
-
+var userAgents =  Paths.get("user-agents.txt").readText().split("\n")
 
 fun login(userId: String = ""): String {
     var html = ""
