@@ -16,7 +16,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.random.Random
 
-var index = 3
+var index = 0
 
 val creds = listOf(
     Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -27,7 +27,8 @@ val creds = listOf(
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
 )
 
-var userAgents = listOf<String>()
+var userAgents =  Paths.get("src/main/resources/user-agents.txt").readText().split("\n")
+
 
 fun login(userId: String = ""): String {
     var html = ""
