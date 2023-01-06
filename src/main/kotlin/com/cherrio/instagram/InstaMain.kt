@@ -191,7 +191,7 @@ suspend fun checkPointOrRefresh(error: String){
             cooky = refreshCookie()
         }
         error.contains("require_login") ->{
-            refreshCookie()
+            cooky = refreshCookie()
         }
         else -> {
             cooky = refreshCookie()
