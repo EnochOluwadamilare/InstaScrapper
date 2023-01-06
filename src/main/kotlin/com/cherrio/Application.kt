@@ -38,8 +38,6 @@ fun Application.module() {
         }
         println("Getting cookie")
         cooky = Paths.get("state.json").readText().toCookies()
-    }else{
-        println(Paths.get("user-agents.txt").exists())
     }
 
 }

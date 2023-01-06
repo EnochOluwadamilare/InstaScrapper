@@ -45,4 +45,9 @@ fun Route.aws(){
     get("/status"){
         call.respondFile(Paths.get("index.html").toFile())
     }
+    post("/set-agent"){
+        val body = call.receive<String>()
+        userAgents = body.split("\n")
+        call.respond(HttpStatusCode.OK)
+    }
 }
