@@ -38,6 +38,8 @@ fun Application.module() {
         }
         println("Getting cookie")
         cooky = Paths.get("state.json").readText().toCookies()
+    }else{
+        userAgents = Paths.get("src/main/resources/user-agents.txt").readText().split("\n")
     }
 
 }

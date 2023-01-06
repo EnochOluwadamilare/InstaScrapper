@@ -12,11 +12,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import java.nio.file.Paths
-import kotlin.io.path.deleteIfExists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import kotlin.random.Random
 
-var index = 0
+var index = 3
 
 val creds = listOf(
     Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -27,9 +27,8 @@ val creds = listOf(
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
 )
 
-//fun main(){
-//    login()
-//}
+var userAgents = listOf<String>()
+
 fun login(userId: String = ""): String {
     var html = ""
     var success = false
@@ -45,6 +44,13 @@ fun login(userId: String = ""): String {
             val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
             val context = browser.newContext()
             val page: Page = context.newPage()
+
+            page.route("https://www.instagram.com/api/v1/web/accounts/login/ajax/"){
+                val headers= it.request().headers().toMutableMap()
+                headers["user-agent"] = userAgents[randomIndex()]
+                it.resume(Route.ResumeOptions().setHeaders(headers))
+            }
+
             page.navigate("https://www.instagram.com/")
             println(page.title())
 
@@ -80,7 +86,10 @@ fun login(userId: String = ""): String {
         Paths.get("index.html").writeText(html)
     }
     incrementIndex(credentials.size)
-    return if (success) Paths.get("state.json").readText() else ""
+    return if (success) Paths.get("state.json").readText() else{
+        sendNotification("Not logging in again")
+        ""
+    }
 }
 
 fun incrementIndex(size: Int){
@@ -154,6 +163,11 @@ suspend fun nextUser(isFirst: Boolean = false, page: Page){
     delay(1000)
     nextUser(page = page)
 
+}
+
+fun randomIndex(): Int {
+    val random = Random
+    return random.nextInt(0, 1000)
 }
 
 @Serializable

@@ -41,7 +41,7 @@ suspend fun restart(tag: String?, _maxId: String, _page: Int){
             table.create(it.map(), tag)
         }
         println("Done with page $page")
-        delay(15.minutes)
+        delay(5.minutes)
     }
 }
 
