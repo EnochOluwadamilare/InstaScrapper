@@ -187,8 +187,7 @@ suspend fun checkPointOrRefresh(error: String){
             cooky = refreshCookie(userId = cooky!!.cookies.find { it.name == "ds_user_id"}!!.value)
         }
         error.contains("spam") -> {
-            delay(10.minutes)
-            cooky = refreshCookie()
+            delay(20.minutes)
         }
         error.contains("require_login") ->{
             cooky = refreshCookie()
