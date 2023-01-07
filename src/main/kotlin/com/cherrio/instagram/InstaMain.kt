@@ -65,7 +65,7 @@ suspend fun refreshCookie(userId: String = "", state: Boolean = false): Cookies?
             println(loginResponse)
             loginResponse.bodyAsText().toCookies()
         }else{
-            delay(30.minutes)
+            delay(5.minutes)
             refreshCookie()
         }
 

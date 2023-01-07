@@ -17,7 +17,7 @@ import kotlin.io.path.writeText
 import kotlin.math.log
 import kotlin.random.Random
 
-var index = 0
+var index = 5
 
 val creds = listOf(
     Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -88,7 +88,7 @@ fun login(userId: String = ""): String {
     }
     incrementIndex(credentials.size)
     return if (success) Paths.get("state.json").readText() else{
-        sendNotification("Not logging in again")
+        sendNotification("Not logging in again, $email")
         ""
     }
 }
