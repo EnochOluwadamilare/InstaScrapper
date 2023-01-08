@@ -12,6 +12,39 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 
+interface MyInterface{
+
+    companion object: MyInterface
+    fun then(myInterface: MyInterface): MyInterface{
+        println(this === myInterface)
+        list.add(myInterface)
+        return myInterface
+    }
+}
+
+val MyInterface.list by lazy { mutableListOf<MyInterface>() }
+
+class Pad(string: String): MyInterface{
+
+}
+class Bag(string: String): MyInterface{
+
+}
+fun MyInterface.padd(string: String): MyInterface{
+    return then(Pad(string))
+}
+fun MyInterface.bag(string: String): MyInterface{
+    return then(Bag(string))
+}
+
+fun button(myInterface: MyInterface = MyInterface){
+    println(myInterface.list.size)
+}
+//fun main(){
+//   button(MyInterface.padd("15.dp").bag("Joseph"))
+//    button(MyInterface.padd("80").bag("Keys"))
+//    println(MyInterface.list)
+//}
 
 @Serializable
 data class Login(
