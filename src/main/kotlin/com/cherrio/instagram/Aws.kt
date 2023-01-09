@@ -17,12 +17,12 @@ import kotlin.io.path.writeText
 import kotlin.math.log
 import kotlin.random.Random
 
-var index = 5
+var index = 2
 
 val creds = listOf(
     Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
     Triple("cherrio.llc@gmail.com","Ayodele4_","56978350990"),
-    Triple("elizabethy.keen@gmail.com","Elizabeth12_","57221602232"),
+    Triple("elizabethy.keen@gmail.com","Keen12_","57221602232"),
     Triple("donaldy.ressler@gmail.com","Donald12_","57201108496"),
     Triple("ray.redd.reddington@gmail.com","Raymond12_","57232760704"),
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
@@ -46,6 +46,14 @@ fun login(userId: String = ""): String {
             val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
             val context = browser.newContext()
             val page: Page = context.newPage()
+
+            page.onResponse {
+                if (it.url().equals("https://www.instagram.com/api/v1/web/accounts/login/ajax/")){
+                    if (!it.ok()){
+                        sendNotification("Error logging in for $email. With error: ${it.statusText()} code: ${it.status()}.")
+                    }
+                }
+            }
 
             page.route("https://www.instagram.com/api/v1/web/accounts/login/ajax/"){
                 val headers= it.request().headers().toMutableMap()
