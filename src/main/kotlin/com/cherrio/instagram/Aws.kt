@@ -48,14 +48,12 @@ fun login(userId: String = ""): String {
             val page: Page = context.newPage()
 
             page.onResponse {
-                if (it.url().equals("https://www.instagram.com/api/v1/web/accounts/login/ajax/")){
-                    if (!it.ok()){
-                        sendNotification("Error logging in for $email. With error: ${it.statusText()} code: ${it.status()}.")
-                    }
+                if (!it.ok()){
+                    sendNotification("Error logging in for $email. With error: ${it.statusText()} code: ${it.status()}, url: ${it.url()}")
                 }
             }
 
-            page.route("https://www.instagram.com/api/v1/web/accounts/login/ajax/"){
+            page.route("**/*"){
                 val headers= it.request().headers().toMutableMap()
                 headers["user-agent"] = userAgents[randomIndex()]
                 it.resume(Route.ResumeOptions().setHeaders(headers))
