@@ -28,7 +28,7 @@ val creds = listOf(
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
 )
 
-var userAgents =  listOf<String>() //Paths.get("user-agents.txt").readText().split("\n")
+var userAgents =  listOf<String>()//Paths.get("user-agents.txt").readText().split("\n")
 
 
 fun login(userId: String = ""): String {
@@ -43,7 +43,7 @@ fun login(userId: String = ""): String {
     println("Using: $email")
     try {
         Playwright.create().use { playwright ->
-            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
+            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
             val context = browser.newContext()
             val page: Page = context.newPage()
 
