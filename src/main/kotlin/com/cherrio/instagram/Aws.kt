@@ -28,8 +28,11 @@ val creds = listOf(
     Triple("oaks224@gmail.com","Ayodele4_","56822524662")
 )
 
-var userAgents =  listOf<String>()//Paths.get("user-agents.txt").readText().split("\n")
-
+var userAgents =  Paths.get("user-agents.txt").readText().split("\n")
+//var userAgents =  listOf<String>()
+//fun main(){
+//    login()
+//}
 
 fun login(userId: String = ""): String {
     var html = ""
