@@ -28,21 +28,13 @@ fun Application.configureRouting() {
             staticRootFolder = File("onelink")
             files(".")
         }
+        get("/"){
+            call.respondFile(file)
+        }
         get("/link/{id}"){
             call.respondFile(file)
         }
-        get("/"){
-            call.respondText("fun String.clean(): Set<String>{\n" +
-                    "    val stopwords = setOf(\"limited\",\"nigeria\",\"plc\",\"ltd\",\"company\",\"nig\",\"international\",\"int\",\"investment\")\n" +
-                    "    return replace(Regex(\"[0-9]\"),\"\")\n" +
-                    "        .replace(Regex(\"[:/;&^%\$#@!]\"),\" \")\n" +
-                    "        .split(Regex(\"\\\\s\")).asSequence()\n" +
-                    "        .map { it.replace(Regex(\"[^A-Za-z]\"),\"\").lowercase() }\n" +
-                    "        .filter { it.length >= 3 && it !in stopwords }\n" +
-                    "        .distinct()\n" +
-                    "        .toSet()\n" +
-                    "}")
-        }
+
         post("/"){
             val data = call.receive<String>()
             println(data)

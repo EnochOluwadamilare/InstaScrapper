@@ -2,46 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CashPally</title>
-    <script type="application/javascript">
-        function getMobileOperatingSystem() {
-            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-            // Windows Phone must come first because its UA also contains "Android"
-            if (/windows phone/i.test(userAgent)) {
-                return "Windows Phone";
-            }
-
-            if (/android/i.test(userAgent)) {
-                return "Android";
-            }
-
-            // iOS detection from: http://stackoverflow.com/a/9039885/177710
-            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                return "iOS";
-            }
-
-            return "unknown";
+    <title>Cherrio LLC</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            padding: 0;
+            margin: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        var query = window.location.href.lastIndexOf("/");
-        var text = window.location.href.substring(query + 1)
-        var client = getMobileOperatingSystem()
-        alert("Copied the text: " + client);
-        // Copy the text inside the text field
 
-        if (client == "Android"){
-            window.location.href = "https://play.google.com/store/apps/details?id=com.nqb8.cashpally";
-        }else if (client == "iOS"){
-            window.location.replace("https://apps.apple.com/us/app/altarbell/id1542215706?platform=iphone");
-        }else {
-            window.location.replace("https://cashpally.com");
+        .cookiesContent {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            color: #000;
+            text-align: center;
+            border-radius: 20px;
+            padding: 30px 30px 70px;
+            box-shadow: 0 3px 8px -7px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
         }
-        navigator.clipboard.writeText(text);
+        img {
+            width: 82px;
+            margin-bottom: 15px;
+        }
+        p {
+            font-size: 18px;
+        }
+        p.inst {
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+        button.accept {
+            background-color: #1DA3BB;
+            border: none;
+            border-radius: 5px;
+            width: 200px;
+            padding: 14px;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 6px 18px -5px rgba(237, 103, 85, 1);
+            cursor: pointer;
+        }
 
-        // Alert the copied text
-
-    </script>
+    </style>
 </head>
 <body>
+<div class="container">
+    <div class="cookiesContent" id="cookiesPopup">
+        <!--    <button class="close">✖</button>-->
+        <img src="https://img.icons8.com/arcade/64/null/meeting.png" alt="cookies-img" />
+
+        <p>Welcome to Cherrio's</p>
+        <p class="inst">Tap on the button below to continue</p>
+        <button id="continue" class="accept">Continue</button>
+    </div>
+</div>
+
+<script async id="slcLiveChat" src="https://widget.sonetel.com/SonetelWidget.min.js" data-account-id="208160580"></script>
 </body>
 </html>
