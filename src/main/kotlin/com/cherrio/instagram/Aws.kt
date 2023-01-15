@@ -46,7 +46,7 @@ fun login(userId: String = ""): String {
     println("Using: $email")
     try {
         Playwright.create().use { playwright ->
-            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
+            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(true))
             val context = browser.newContext()
             val page: Page = context.newPage()
 
