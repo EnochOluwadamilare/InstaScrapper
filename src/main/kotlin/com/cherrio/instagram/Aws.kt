@@ -17,7 +17,7 @@ import kotlin.io.path.writeText
 import kotlin.math.log
 import kotlin.random.Random
 
-var index = 2
+var index = 0
 
 val creds = listOf(
     Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -46,7 +46,7 @@ fun login(userId: String = ""): String {
     println("Using: $email")
     try {
         Playwright.create().use { playwright ->
-            val browser: Browser = playwright.firefox().launch(BrowserType.LaunchOptions().setHeadless(false))
+            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
             val context = browser.newContext()
             val page: Page = context.newPage()
 
