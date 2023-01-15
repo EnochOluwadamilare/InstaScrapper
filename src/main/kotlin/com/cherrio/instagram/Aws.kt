@@ -46,15 +46,10 @@ fun login(userId: String = ""): String {
     println("Using: $email")
     try {
         Playwright.create().use { playwright ->
-            val browser: Browser = playwright.chromium().launch(BrowserType.LaunchOptions().setHeadless(false))
+            val browser: Browser = playwright.firefox().launch(BrowserType.LaunchOptions().setHeadless(false))
             val context = browser.newContext()
             val page: Page = context.newPage()
 
-            page.onResponse {
-                if (!it.ok()){
-                    sendNotification("Error logging in for $email. With error: ${it.statusText()} code: ${it.status()}, url: ${it.url()}")
-                }
-            }
 
             page.route("**/*"){
                 val headers= it.request().headers().toMutableMap()
