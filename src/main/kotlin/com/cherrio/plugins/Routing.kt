@@ -29,7 +29,7 @@ fun Application.configureRouting() {
             files(".")
         }
         get("/"){
-            call.respondFile(file)
+            call.respond(HttpStatusCode.OK,"Welcome")
         }
         get("/link/{id}"){
             call.respondFile(file)
