@@ -17,7 +17,7 @@ import kotlin.io.path.writeText
 import kotlin.math.log
 import kotlin.random.Random
 
-var index = 5
+var index = 3
 
 val creds = listOf(
     Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -66,7 +66,7 @@ fun login(userId: String = ""): String {
             page.locator("[name='password']").fill(password)
             page.locator("[type='submit']").click()
 
-            page.getByText("Save information").first().click()
+            //page.getByText("Save information").first().click()
 //
 //        page.onPopup {
 //            it.getByText("Not Now").first().click()
