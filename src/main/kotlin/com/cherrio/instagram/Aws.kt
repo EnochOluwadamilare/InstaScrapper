@@ -17,7 +17,7 @@ import kotlin.io.path.writeText
 import kotlin.math.log
 import kotlin.random.Random
 
-var index = 0
+var index = 5
 
 val creds = listOf(
     Triple("jazzedayo@gmail.com","Ayodele4_","47362721982"),
@@ -51,11 +51,11 @@ fun login(userId: String = ""): String {
             val page: Page = context.newPage()
 
 
-            page.route("**/*"){
-                val headers= it.request().headers().toMutableMap()
-                headers["user-agent"] = userAgents[randomIndex()]
-                it.resume(Route.ResumeOptions().setHeaders(headers))
-            }
+//            page.route("**/*"){
+//                val headers= it.request().headers().toMutableMap()
+//                headers["user-agent"] = userAgents[randomIndex()]
+//                it.resume(Route.ResumeOptions().setHeaders(headers))
+//            }
 
             page.navigate("https://www.instagram.com/")
             println(page.title())
@@ -66,7 +66,7 @@ fun login(userId: String = ""): String {
             page.locator("[name='password']").fill(password)
             page.locator("[type='submit']").click()
 
-//        page.getByText("Save information").first().click()
+            page.getByText("Save information").first().click()
 //
 //        page.onPopup {
 //            it.getByText("Not Now").first().click()
