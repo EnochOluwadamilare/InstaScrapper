@@ -31,6 +31,13 @@ fun Route.railway(){
         cooky = body.toCookies()
         call.respond(HttpStatusCode.OK)
     }
+    get("/next-tag"){
+        val params = call.parameters
+        val page = params["page"] ?: "2"
+        val tag = params["tag"]!!
+        setDetails(tag,page)
+        call.respond(HttpStatusCode.OK,"Ok")
+    }
 }
 
 fun Route.aws(){

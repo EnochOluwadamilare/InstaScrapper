@@ -44,6 +44,10 @@ suspend fun restart(tag: String?, _maxId: String, _page: Int){
         delay(5.minutes)
     }
 }
+fun setDetails(_tag: String, _page: String){
+    page = _page.toInt()
+    tag = _tag
+}
 
 suspend fun refreshCookie(userId: String = "", state: Boolean = false): Cookies?{
     println("Refreshing...")
