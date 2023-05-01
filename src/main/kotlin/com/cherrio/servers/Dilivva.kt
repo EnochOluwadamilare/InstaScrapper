@@ -67,8 +67,6 @@ suspend fun checkNewUsers(){
     }
 }
 
-
-
 fun filter(user: User): Boolean {
     val userRegistered = user.createdAt.toInstant()
     return userRegistered > today
