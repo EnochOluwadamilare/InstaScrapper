@@ -5,6 +5,7 @@ import com.cherrio.instagram.table
 import com.cherrio.plugins.Resource
 import com.cherrio.plugins.client
 import com.cherrio.plugins.doNetworkCall
+import com.cherrio.servers.dilivvaSheetsDb
 import com.cherrio.sheetsdb.init.getTable
 import io.ktor.client.call.*
 import io.ktor.client.request.forms.*
@@ -15,8 +16,10 @@ import kotlinx.serialization.Serializable
 
 
 suspend fun refreshGoogleToken(){
-    val token = getRefreshToken()
-    sheetDb.setBearerToken(token)
+    //val token = getRefreshToken()
+    //sheetDb.setBearerToken(token)
+    val token = getDilivvaRefreshToken()
+    dilivvaSheetsDb.setBearerToken(token)
 }
 
 
@@ -28,6 +31,34 @@ private suspend fun getRefreshToken(): String{
                 append("clientId", "414805296428-detqeq7urb2krmr8dicu4b1p0th9ncil.apps.googleusercontent.com")
                 append("client_secret", "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")
                 append("refresh_token", "1//03pDmZ6uCcbZ_CgYIARAAGAMSNwF-L9IrmRTBa8TtiJHKWEG5HY-f6h3DtOcB6X8t9JIqmOW60dNLXoBiOZdZ-mrBIgFWyIqZNBI")
+            },
+            encodeInQuery = true
+        ){
+            method = HttpMethod.Post
+        }
+        Resource.Success(response.body<ResponseGD>())
+    }
+    return if (request.isSuccessful){
+        println(request.data!!.accessToken.substring(0,10))
+        request.data.accessToken
+    }else{
+        println("Couldn't get token")
+        throw IllegalStateException("Couldn't get token")
+    }
+
+}
+
+private suspend fun getDilivvaRefreshToken(): String{
+    val clientId = System.getenv("CLIENT_ID")
+    val clientSecret = System.getenv("CLIENT_SECRET")
+    val refreshToken = System.getenv("REFRESH_TOKEN")
+    val request = doNetworkCall {
+        val response = client.submitForm("https://www.googleapis.com/oauth2/v4/token",
+            formParameters = Parameters.build {
+                append("grant_type", "refresh_token")
+                append("clientId", clientId)
+                append("client_secret", clientSecret)
+                append("refresh_token", refreshToken)
             },
             encodeInQuery = true
         ){

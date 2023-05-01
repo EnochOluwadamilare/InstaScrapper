@@ -3,6 +3,7 @@ package com.cherrio
 import com.cherrio.instagram.*
 import io.ktor.server.application.*
 import com.cherrio.plugins.*
+import com.cherrio.servers.checkNewUsers
 import com.cherrio.servers.railwayServerRouting
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.netty.*
@@ -28,16 +29,29 @@ fun Application.module() {
     configureLogging()
     scrapperRouting()
     railwayServerRouting()
-    val railway = System.getenv("RAILWAY")
-    if (railway != null) {
-        launch {
-            while (true) {
-                refreshGoogleToken()
-                delay(Duration.ofMinutes(45))
-            }
+//    val railway = System.getenv("RAILWAY")
+//    if (railway != null) {
+//        launch {
+//            while (true) {
+//                refreshGoogleToken()
+//                delay(Duration.ofMinutes(45))
+//            }
+//        }
+//        println("Getting cookie")
+//        cooky = Paths.get("state.json").readText().toCookies()
+//    }
+    launch {
+        while (true) {
+            println("Refreshing token")
+            refreshGoogleToken()
+            delay(Duration.ofMinutes(45))
         }
-        println("Getting cookie")
-        cooky = Paths.get("state.json").readText().toCookies()
+    }
+    launch {
+        while (true){
+            checkNewUsers()
+            delay(Duration.ofMinutes(3))
+        }
     }
 
 }

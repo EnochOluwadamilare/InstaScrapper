@@ -11,6 +11,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import java.net.InetAddress
+import java.util.*
 
 interface MyInterface{
 
@@ -41,10 +43,111 @@ fun button(myInterface: MyInterface = MyInterface){
     println(myInterface.list.size)
 }
 //fun main(){
-//   button(MyInterface.padd("15.dp").bag("Joseph"))
-//    button(MyInterface.padd("80").bag("Keys"))
-//    println(MyInterface.list)
+//    val localhost: InetAddress = InetAddress.getLocalHost()
+//    println("Ip=${localhost.hostAddress}")
+//    getAllIp()
 //}
+
+class MutableState<T>(initialValue: T) {
+    private var value: T = initialValue
+    private val listeners = mutableListOf<(T) -> Unit>()
+
+    fun get(): T = value
+
+    fun set(newValue: T) {
+        if (newValue != value) {
+            value = newValue
+            listeners.forEach { it(newValue) }
+        }
+    }
+
+    fun observe(observer: (T) -> Unit) {
+        listeners.add(observer)
+        observer(value)
+    }
+}
+
+interface UIComponent {
+    fun render()
+}
+
+class Composable(val invoke: () -> Unit)
+
+class Label(private val text: String, private val onTextChanged: (Label) -> Unit) : UIComponent {
+    override fun render() {
+        println("Label: $text")
+    }
+
+    init {
+        onTextChanged(this)
+    }
+}
+
+class Renderer(private val root: UIComponent) : UIComponent {
+    override fun render() {
+        root.render()
+    }
+}
+
+class Row : UIComponent {
+    private val children = mutableListOf<UIComponent>()
+
+    operator fun UIComponent.unaryPlus() {
+        children.add(this)
+    }
+
+    override fun render() {
+        children.forEach {
+            it.render()
+        }
+    }
+}
+
+fun row(init: Row.() -> Unit): Row {
+    val row = Row()
+    row.init()
+    return row
+}
+
+fun main() {
+    val labelState = MutableState("Hello")
+
+    val ui = row {
+        + Label(labelState.get()) {
+            it.render()
+        }
+    }
+
+//    val renderer = Renderer(ui)
+//
+//    renderer.render()
+
+    labelState.set("Goodbye")
+    ui
+}
+
+
+
+
+
+
+fun getAllIp(): List<String> {
+    val result: MutableList<String> = ArrayList()
+    val localhost = InetAddress.getLocalHost()
+    // this code assumes IPv4 is used
+    // this code assumes IPv4 is used
+    val ip = localhost.address
+
+    for (i in 1..254) {
+        ip[3] = i.toByte()
+        val address = InetAddress.getByAddress(ip)
+        if (address.isReachable(1000)) {
+            println("$address machine is turned on and can be pinged")
+            println("Name: ${address.hostName}")
+        }
+    }
+    return result
+}
 
 @Serializable
 data class Login(

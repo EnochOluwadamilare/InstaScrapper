@@ -60,6 +60,8 @@ dependencies {
     implementation("io.github.cherrio-llc:sheets-db:0.0.1-SNAPSHOT")
     implementation(libs.jsoup)
 
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
     implementation("com.microsoft.playwright:playwright:1.27.0")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
