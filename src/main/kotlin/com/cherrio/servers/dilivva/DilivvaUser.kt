@@ -13,3 +13,13 @@ data class DilivvaUser(
     @SerialName("data")
     val `data`: Data = Data()
 )
+
+@Serializable
+data class DilivvaApiResponse(
+    @SerialName("status")
+    val status: String = "",
+    @SerialName("message")
+    val message: String = "",
+    @SerialName("data")
+    val data: User = User()
+)

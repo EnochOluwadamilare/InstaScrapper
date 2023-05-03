@@ -2,10 +2,7 @@ package com.cherrio.servers
 
 import com.cherrio.instagram.sheetDb
 import com.cherrio.plugins.client
-import com.cherrio.servers.dilivva.DilivvaUser
-import com.cherrio.servers.dilivva.Sender
-import com.cherrio.servers.dilivva.User
-import com.cherrio.servers.dilivva.toSender
+import com.cherrio.servers.dilivva.*
 import com.cherrio.sheetsdb.database.create
 import com.cherrio.sheetsdb.init.SheetsDb
 import com.cherrio.sheetsdb.init.getTable
@@ -13,6 +10,8 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
@@ -37,7 +36,7 @@ import java.util.*
 //}
 
 private val inputFormat = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a", Locale.US)
-private var beginDate = "Thu, Apr 27, 2023 6:33 PM"
+private var beginDate = "Mon, May 1, 2023 11:27 AM"
 private var today = beginDate.toInstant() //now.toInstant(TimeZone.currentSystemDefault())
 private const val googleSheetId = "1tHpaIP3ZZhZiuFhyF-GkxESQbsXexGQpkzXL66h_zfE"
 val dilivvaSheetsDb = SheetsDb {
@@ -49,22 +48,36 @@ suspend fun checkNewUsers(){
     val response = client.get("https://api.dilivva.com/api/v1/admin/users?perPage=50&page=1&sort=desc"){
         bearerAuth(bearerToken)
     }
-    println("Before: $beginDate")
     if (response.status.isSuccess()) {
         val dilivvaUser = response.body<DilivvaUser>()
-        val newUsers = dilivvaUser.data.users.filter(::filter).map(::toSender)
+        val newUsers = dilivvaUser.data.users.filter(::filter)
         println("New users are: ${newUsers.size}")
-        if (newUsers.isNotEmpty()) {
-            newUsers.forEach {
-                table.create(it)
-            }
-            beginDate = newUsers.first().createdAt
-            today = beginDate.toInstant()
-            println("New begin date: $beginDate")
+        if (newUsers.isEmpty()) return
+        val senders = newUsers.map { mapToSender(it) }
+        senders.forEach {
+            table.create(it)
         }
+        beginDate = senders.first().createdAt
+        today = beginDate.toInstant()
+        println("New begin date: $beginDate")
     }else{
         println(response.bodyAsText())
     }
+}
+
+suspend fun mapToSender(user: User): Sender{
+    val businessName = coroutineScope { async { getUserProfile(user.uuid) } }.await()
+    val sender = toSender(user)
+    return sender.addBusinessName(businessName)
+}
+private suspend fun getUserProfile(userId: String): String?{
+    val response = client.get("https://api.dilivva.com/api/v1/admin/users/$userId"){
+        bearerAuth(bearerToken)
+    }
+    if (!response.status.isSuccess()) return null
+    val user = response.body<DilivvaApiResponse>()
+    if (user.data.business == null) return null
+    return user.data.business.businessName
 }
 
 fun filter(user: User): Boolean {

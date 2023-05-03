@@ -24,6 +24,8 @@ data class User(
     val isBanned: Boolean = false,
     @SerialName("ban_comment")
     val banComment: String = "",
+    @SerialName("business")
+    val business: Business? = null,
     @SerialName("ban_expiry")
     val banExpiry: String = "",
     @SerialName("email_verified_at")
@@ -34,6 +36,12 @@ data class User(
     val createdAt: String = "",
     @SerialName("updated_at")
     val updatedAt: String = ""
+)
+
+@Serializable
+data class Business(
+    @SerialName("name")
+    val businessName: String
 )
 
 @Serializable
@@ -49,10 +57,14 @@ data class Sender(
     @SerialName("verified_email")
     val emailVerifiedAt: String? = null,
     @SerialName("sign_up_time")
-    val createdAt: String = ""
+    val createdAt: String = "",
+    @SerialName("business_name")
+    val businessName: String = "NONE"
 )
 
 fun toSender(user: User) = Sender(
     user.id, user.fullName, user.email, user.phone, if (user.emailVerifiedAt != null) "yes" else "no", user.createdAt
 )
+fun Sender.addBusinessName(name: String?) =
+    copy(businessName = name ?: "NONE")
 
