@@ -36,7 +36,7 @@ import java.util.*
 //}
 
 private val inputFormat = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a", Locale.US)
-private var beginDate = "Mon, May 1, 2023 11:27 AM"
+private var beginDate = "Sun, Apr 30, 2023 11:27 AM"
 private var today = beginDate.toInstant() //now.toInstant(TimeZone.currentSystemDefault())
 private const val googleSheetId = "1tHpaIP3ZZhZiuFhyF-GkxESQbsXexGQpkzXL66h_zfE"
 val dilivvaSheetsDb = SheetsDb {
