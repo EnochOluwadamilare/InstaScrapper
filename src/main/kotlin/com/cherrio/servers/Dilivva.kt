@@ -28,16 +28,20 @@ import java.util.*
 //        "Mon, May 1, 2023 8:00 AM",
 //        "Mon, May 1, 2023 8:01 AM"
 //    ).forEach {
-//        val time = it.toInstant()
-//        val isGreater = time > today
-//        println("Is today: $isGreater ")
+//        //val time = it.toInstant()
+//        //val isGreater = time > today
+//
 //    }
+//
+//    val to = "5Fri, May 5, 2023 1:20 PM;"
+//
+//    println("Is today: ${to.clean()} ")
 //
 //}
 
 private val inputFormat = DateTimeFormatter.ofPattern("E, MMM d, yyyy h:mm a", Locale.US)
-private var beginDate = "Sun, Apr 30, 2023 11:27 AM"
-private var today = beginDate.toInstant() //now.toInstant(TimeZone.currentSystemDefault())
+private var beginDate = "Fri, May 5, 2023 1:20 PM"
+private var today = beginDate.clean().toInstant() //now.toInstant(TimeZone.currentSystemDefault())
 private const val googleSheetId = "1tHpaIP3ZZhZiuFhyF-GkxESQbsXexGQpkzXL66h_zfE"
 val dilivvaSheetsDb = SheetsDb {
     sheetId = googleSheetId
@@ -87,4 +91,14 @@ fun filter(user: User): Boolean {
 fun String.toInstant(): Instant{
     val localDateTime = LocalDateTime.parse(this, inputFormat)
     return localDateTime.toKotlinLocalDateTime().toInstant(TimeZone.UTC)
+}
+fun String.clean(): String{
+    var cleanString = this
+    if (!cleanString.first().isLetter()) {
+        cleanString = cleanString.substring(1)
+    }
+    if (!cleanString.last().isLetter()) {
+        cleanString = cleanString.substring(0, length - 2)
+    }
+    return cleanString
 }
